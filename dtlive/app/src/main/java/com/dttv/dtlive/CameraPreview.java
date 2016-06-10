@@ -9,12 +9,13 @@ import android.view.SurfaceView;
 import java.io.IOException;
 import java.util.*;
 
-public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback{
+public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
 
     static final String TAG = "CAMERA-PREVIEW";
 
     private SurfaceHolder mHolder;
     private Camera mCamera;
+
     public CameraPreview(Context context, Camera camera) {
         super(context);
         mCamera = camera;
@@ -25,6 +26,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         mHolder.addCallback(this);
         // deprecated setting, but required on Android versions prior to 3.0
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        Log.i(TAG, "OnCreate\n");
     }
 
     public void surfaceCreated(SurfaceHolder holder) {
@@ -35,6 +37,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         } catch (IOException e) {
             Log.d(TAG, "Error setting camera preview: " + e.getMessage());
         }
+
+        Log.i(TAG, "SurfaceCreated \n");
     }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
@@ -45,15 +49,16 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         // If your preview can change or rotate, take care of those events here.
         // Make sure to stop the preview before resizing or reformatting it.
 
-        if (mHolder.getSurface() == null){
+        if (mHolder.getSurface() == null) {
             // preview surface does not exist
             return;
         }
 
+        Log.i(TAG, "surfaceChanged width: " + w + " height:" + h);
         // stop preview before making changes
         try {
             mCamera.stopPreview();
-        } catch (Exception e){
+        } catch (Exception e) {
             // ignore: tried to stop a non-existent preview
         }
 
@@ -65,7 +70,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mCamera.setPreviewDisplay(mHolder);
             mCamera.startPreview();
 
-        } catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "Error starting camera preview: " + e.getMessage());
         }
     }
