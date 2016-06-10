@@ -5,6 +5,7 @@ import android.hardware.Camera;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.FrameLayout;
 
 import java.io.IOException;
 import java.util.*;
@@ -16,6 +17,11 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private SurfaceHolder mHolder;
     private Camera mCamera;
 
+    private List<Camera.Size> mListSupportedSizes;
+    Camera.Size mCurrentSize;
+    private List<int[]> mListSupportedFps;
+    int mCurrentFrameRate;
+
     public CameraPreview(Context context, Camera camera) {
         super(context);
         mCamera = camera;
@@ -26,7 +32,31 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         mHolder.addCallback(this);
         // deprecated setting, but required on Android versions prior to 3.0
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
+        // setup camera parameter
+        Camera.Parameters p = mCamera.getParameters();
+
+        mListSupportedFps = p.getSupportedPreviewFpsRange();
+        for(int i=0; i< mListSupportedFps.size(); i++)
+        {
+            Log.d(TAG, "Support FrameFps: " + "[" + mListSupportedFps.get(i)[0] + ":" + mListSupportedFps.get(i)[1] + "]" );
+        }
+
+        mListSupportedSizes = p.getSupportedPreviewSizes();
+        for(Camera.Size size : mListSupportedSizes)
+        {
+            Log.d(TAG, "Support Size: [" + size.width + ":" +size.height +"]");
+        }
+        mCurrentSize = mListSupportedSizes.get(mListSupportedSizes.size()-1);
+        p.setPreviewSize(mCurrentSize.width, mCurrentSize.height);
+        mCamera.setParameters(p);
+
         Log.i(TAG, "OnCreate\n");
+    }
+
+    public Camera.Size getCurrentSize()
+    {
+        return mCurrentSize;
     }
 
     public void surfaceCreated(SurfaceHolder holder) {

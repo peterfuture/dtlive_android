@@ -38,11 +38,6 @@ public class CameraActivity extends Activity {
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
 
-    private List<Camera.Size> mListSupportedSizes;
-    Camera.Size mCurrentSize;
-    private List<int[]> mListSupportedFps;
-    int mCurrentFrameRate;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,29 +45,10 @@ public class CameraActivity extends Activity {
 
         // Create an instance of Camera
         mCamera = getCameraInstance();
-
         // Create our Preview view and set it as the content of our activity.
         mPreview = new CameraPreview(this, mCamera);
         FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
         preview.addView(mPreview);
-
-        Camera.Parameters p = mCamera.getParameters();
-
-        mListSupportedFps = p.getSupportedPreviewFpsRange();
-        for(int i=0; i< mListSupportedFps.size(); i++)
-        {
-            Log.d(TAG, "Support FrameFps: " + "[" + mListSupportedFps.get(i)[0] + ":" + mListSupportedFps.get(i)[1] + "]" );
-        }
-
-        mListSupportedSizes = p.getSupportedPreviewSizes();
-        for(Camera.Size size : mListSupportedSizes)
-        {
-            Log.d(TAG, "Support Size: [" + size.width + ":" +size.height +"]");
-        }
-        mCurrentSize = mListSupportedSizes.get(mListSupportedSizes.size()-1);
-        p.setPreviewSize(mCurrentSize.width, mCurrentSize.height);
-        mCamera.setParameters(p);
-
 
         // Add a listener to the Capture button
         captureImageButton = (Button) findViewById(R.id.button_capture_image);
@@ -238,8 +214,8 @@ public class CameraActivity extends Activity {
         // Step 3: Set a CamcorderProfile (requires API Level 8 or higher)
         // Use the same size for recording profile.
         CamcorderProfile profile = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
-        profile.videoFrameWidth = mCurrentSize.width;
-        profile.videoFrameHeight = mCurrentSize.height;
+        profile.videoFrameWidth = mPreview.getCurrentSize().width;
+        profile.videoFrameHeight = mPreview.getCurrentSize().height;
         mMediaRecorder.setProfile(profile);
 
         // Step 4: Set output file
