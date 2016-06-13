@@ -10,13 +10,11 @@ import android.media.Image;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Environment;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,7 +22,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 public class CameraActivity extends Activity {
 
@@ -320,6 +317,14 @@ public class CameraActivity extends Activity {
             mCamera.release();        // release the camera for other applications
             mCamera = null;
         }
+    }
+
+    private native void native_video_encoder_init(int width, int height);
+    //private native void nativeVideoEncoderRelease(int width, int height);
+    //private native int nativeVideoEncode(byte[] in, byte[] out, int flag);
+
+    static {
+        System.loadLibrary("dtlive_jni");
     }
 
 }
