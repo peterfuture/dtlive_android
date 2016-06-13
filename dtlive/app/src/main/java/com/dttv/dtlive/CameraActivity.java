@@ -3,8 +3,10 @@ package com.dttv.dtlive;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
+import android.media.Image;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Environment;
@@ -14,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -31,12 +34,19 @@ public class CameraActivity extends Activity {
     private CameraPreview mPreview;
     private MediaRecorder mMediaRecorder;
 
-    Button captureImageButton;
-    Button captureVideoButton;
+    Button captureButton;
+    Button buttonCapturePhoto;
+    Button buttonCaptureVideo;
+    Button buttonCaptureLive;
     private boolean isRecording = false;
 
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
+
+    private static final int CAPTURE_TYPE_PHOTO = 0;
+    private static final int CAPTURE_TYPE_VIDEO = 1;
+    private static final int CAPTURE_TYPE_LIVE = 2;
+    int mCurrentMode = CAPTURE_TYPE_PHOTO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,52 +61,102 @@ public class CameraActivity extends Activity {
         preview.addView(mPreview);
 
         // Add a listener to the Capture button
-        captureImageButton = (Button) findViewById(R.id.button_capture_image);
-        captureImageButton.setOnClickListener(
+        captureButton = (Button) findViewById(R.id.button_capture);
+        captureButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // get an image from the camera
-                        mCamera.takePicture(null, null, mPicture);
-                    }
-                }
-        );
+                        if(mCurrentMode == CAPTURE_TYPE_PHOTO) {
+                            // get an image from the camera
+                            mCamera.takePicture(null, null, mPicture);
+                        }
 
-        // Add a listener to the Capture button
-        captureVideoButton = (Button) findViewById(R.id.button_capture_video);
-        captureVideoButton.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (isRecording) {
-                            // stop recording and release camera
-                            mMediaRecorder.stop();  // stop the recording
-                            releaseMediaRecorder(); // release the MediaRecorder object
-                            mCamera.lock();         // take camera access back from MediaRecorder
+                        if(mCurrentMode == CAPTURE_TYPE_VIDEO) {
+                            if (isRecording) {
+                                // stop recording and release camera
+                                mMediaRecorder.stop();  // stop the recording
+                                releaseMediaRecorder(); // release the MediaRecorder object
+                                mCamera.lock();         // take camera access back from MediaRecorder
 
-                            // inform the user that recording has stopped
-                            setCaptureVideoButtonText("Capture Video");
-                            isRecording = false;
-                        } else {
-                            // initialize video camera
-                            if (prepareVideoRecorder()) {
-                                // Camera is available and unlocked, MediaRecorder is prepared,
-                                // now you can start recording
-                                mMediaRecorder.start();
-
-                                // inform the user that recording has started
-                                setCaptureVideoButtonText("Stop");
-                                isRecording = true;
+                                // inform the user that recording has stopped
+                                setCaptureVideoButtonText("Capture Video");
+                                isRecording = false;
                             } else {
-                                // prepare didn't work, release the camera
-                                releaseMediaRecorder();
-                                // inform user
+                                // initialize video camera
+                                if (prepareVideoRecorder()) {
+                                    // Camera is available and unlocked, MediaRecorder is prepared,
+                                    // now you can start recording
+                                    mMediaRecorder.start();
+
+                                    // inform the user that recording has started
+                                    setCaptureVideoButtonText("Stop");
+                                    isRecording = true;
+                                } else {
+                                    // prepare didn't work, release the camera
+                                    releaseMediaRecorder();
+                                    // inform user
+                                }
                             }
                         }
+
+                        if(mCurrentMode == CAPTURE_TYPE_LIVE) {
+                            // Fixme
+                        }
+
+
                     }
                 }
         );
 
+        // Add a listener to the Capture type button
+        buttonCapturePhoto = (Button) findViewById(R.id.id_capture_type_photo);
+        buttonCapturePhoto.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mCurrentMode = CAPTURE_TYPE_PHOTO;
+                        captureTypeChange(mCurrentMode);
+                    }
+                }
+        );
+
+        buttonCaptureVideo = (Button) findViewById(R.id.id_capture_type_video);
+        buttonCaptureVideo.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mCurrentMode = CAPTURE_TYPE_VIDEO;
+                        captureTypeChange(mCurrentMode);
+                    }
+                }
+        );
+
+        buttonCaptureLive = (Button) findViewById(R.id.id_capture_type_live);
+        buttonCaptureLive.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mCurrentMode = CAPTURE_TYPE_LIVE;
+                        captureTypeChange(mCurrentMode);
+                    }
+                }
+        );
+
+
+        captureTypeChange(mCurrentMode);
+    }
+
+    private void captureTypeChange(int type)
+    {
+        buttonCapturePhoto.setTextColor(Color.BLACK);
+        buttonCaptureVideo.setTextColor(Color.BLACK);
+        buttonCaptureLive.setTextColor(Color.BLACK);
+        if(type == CAPTURE_TYPE_PHOTO)
+            buttonCapturePhoto.setTextColor(Color.BLUE);
+        if(type == CAPTURE_TYPE_VIDEO)
+            buttonCaptureVideo.setTextColor(Color.BLUE);
+        if(type == CAPTURE_TYPE_LIVE)
+            buttonCaptureLive.setTextColor(Color.BLUE);
     }
 
     /**
@@ -195,7 +255,7 @@ public class CameraActivity extends Activity {
     }
 
     private void setCaptureVideoButtonText(String title) {
-        captureVideoButton.setText(title);
+        captureButton.setText(title);
     }
 
     // video capture

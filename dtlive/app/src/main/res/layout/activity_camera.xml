@@ -11,26 +11,45 @@
 
     <FrameLayout
         android:id="@+id/camera_preview"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_weight="1"
         />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        >
-        <Button
-            android:id="@+id/button_capture_image"
-            android:text="Capture image"
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true">
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            />
+            android:orientation="horizontal"
+            android:layout_gravity="center_horizontal"
+            >
+            <Button
+                android:id="@+id/id_capture_type_photo"
+                android:text="Capture image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+            <Button
+                android:id="@+id/id_capture_type_video"
+                android:text="Capture video"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+            <Button
+                android:id="@+id/id_capture_type_live"
+                android:text="Live"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+        </LinearLayout>
         <Button
-            android:id="@+id/button_capture_video"
-            android:text="Capture video"
+            android:id="@+id/button_capture"
+            android:text="Capture"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
