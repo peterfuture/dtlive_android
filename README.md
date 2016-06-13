@@ -12,7 +12,15 @@ This program is free software: you can redistribute it and/or modify it under th
 
 * [dtcodec](https://github.com/peterfuture/dtcodec)
 
-## Help
+## Protocal
+<table>
+<tbody>
+<tr><td><em>type</em></td><td><em>rtmp</em></td><td><em>hls</em></td></tr>
+<tr><td>live</td><td>Todo</td><td>Todo</td></tr>
+</tbody>
+</table>
+
+## Author
 
 >
 Email: peter_future@outlook.com
