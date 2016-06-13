@@ -113,6 +113,7 @@ public class CameraActivity extends Activity {
                     public void onClick(View v) {
                         mCurrentMode = CAPTURE_TYPE_PHOTO;
                         captureTypeChange(mCurrentMode);
+                        native_video_encoder_init(1280, 720);
                     }
                 }
         );
@@ -319,9 +320,9 @@ public class CameraActivity extends Activity {
         }
     }
 
-    private native void native_video_encoder_init(int width, int height);
-    //private native void nativeVideoEncoderRelease(int width, int height);
-    //private native int nativeVideoEncode(byte[] in, byte[] out, int flag);
+    public native int native_video_encoder_init(int width, int height);
+    public native int native_video_encoder_encode(byte[] in, byte[] out, int key);
+    public native void native_video_encoder_release();
 
     static {
         System.loadLibrary("dtlive_jni");

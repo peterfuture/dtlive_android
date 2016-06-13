@@ -19,7 +19,6 @@ model {
             moduleName = 'dtlive_jni'
             toolchain = 'clang'
             stl        = 'gnustl_static'
-
             cppFlags.addAll(['-std=c++11','-Wall'])
             ldLibs.addAll(['log'])
             abiFilters.addAll(['armeabi-v7a'])

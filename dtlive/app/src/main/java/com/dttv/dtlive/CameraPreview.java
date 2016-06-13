@@ -106,15 +106,4 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     }
 
-    // Live Capture
-    public int startCaptureLive()
-    {
-        return 0;
-    }
-
-    public int stopCaptureLive()
-    {
-        return 0;
-    }
-
 }
