@@ -76,6 +76,7 @@ extern "C"  int Java_com_dttv_dtlive_CameraActivity_native_1video_1process(JNIEn
     }
 
     free(pkt.data);
+    free(buf);
     dt_unlock(&vp.mutex);
     return 0;
 }
