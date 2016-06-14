@@ -1,7 +1,19 @@
 //apply plugin: 'com.android.application'
 apply plugin: 'com.android.model.application'
 
+def lib_distribution_root = '../3rd'
+
 model {
+    repositories {
+        libs(PrebuiltLibraries) {
+            dtcodec {
+                headers.srcDir "${lib_distribution_root}/dtcodec/include"
+                binaries.withType(SharedLibraryBinary) {
+                    sharedLibraryFile = file("${lib_distribution_root}/dtcodec/${targetPlatform.getName()}/libdtcodec.so")
+                }
+            }
+        }
+    }
     android {
         compileSdkVersion 23
         buildToolsVersion "23.0.2"
@@ -22,6 +34,21 @@ model {
             cppFlags.addAll(['-std=c++11','-Wall'])
             ldLibs.addAll(['log'])
             abiFilters.addAll(['armeabi-v7a'])
+        }
+
+        sources {
+            main {
+                jni {
+                    dependencies {
+                        library 'dtcodec' linkage 'shared'
+                    }
+                }
+                jniLibs {
+                    source {
+                        srcDir "${lib_distribution_root}/dtcodec/"
+                    }
+                }
+            }
         }
 
         buildTypes {

@@ -20,6 +20,8 @@
 #define dt_lock(x)        pthread_mutex_lock(x)
 #define dt_unlock(x)      pthread_mutex_unlock(x)
 
+#include "codec_api.h"
+
 struct video_processor
 {
     int width;
@@ -27,69 +29,69 @@ struct video_processor
     int count;
 
     dt_lock_t mutex;
+    struct codec_context *video_codec;
 };
 
 static struct video_processor vp;
 
-static int video_encoder_init(JNIEnv *env, jobject thiz, jint width, jint height) {
-    LOGI("Video Encoder Init");
-
+extern "C" int Java_com_dttv_dtlive_CameraActivity_native_1video_1init (JNIEnv *env, jobject thiz, jint width, jint height) {
+    codec_register_all();
     memset(&vp, 0, sizeof(struct video_processor));
     dt_lock_init(&vp.mutex, NULL);
     vp.width = width;
     vp.height = height;
 
+    struct codec_para para;
+    para.width = width;
+    para.height = height;
+    para.is_encoder = 1;
+    para.media_format = CODEC_MEDIA_FORMAT_H264;
+    para.media_type = CODEC_MEDIA_TYPE_VIDEO;
+    vp.video_codec = codec_create_codec(&para);
+    LOGI("Video Encoder Init, [%d:%d]", width, height);
     return 0;
 }
 
-static int video_encoder_encode(JNIEnv *env, jobject thiz, jbyteArray in, jbyteArray out, jint size) {
-    LOGI("Video Encoder Init");
+unsigned char* as_unsigned_char_array(JNIEnv *env, jbyteArray array) {
+    int len = env->GetArrayLength (array);
+    unsigned char* buf = new unsigned char[len];
+    env->GetByteArrayRegion (array, 0, len, reinterpret_cast<jbyte*>(buf));
+    return buf;
+}
+
+extern "C"  int Java_com_dttv_dtlive_CameraActivity_native_1video_1process(JNIEnv *env, jobject thiz, jbyteArray in, jint size) {
+    dt_lock(&vp.mutex);
+
+    struct codec_packet pkt;
+    pkt.data = (uint8_t *)malloc(1920*1080*4);
+    unsigned char *buf = as_unsigned_char_array(env, in);
+    struct codec_frame frame;
+    frame.data = (uint8_t *)buf;
+    frame.size = size;
+    frame.key = 1;
+
+    int ret = codec_encode_frame(vp.video_codec, &pkt, &frame);
+    if(ret > 0) {
+        LOGI("Encode one frame ok");
+    }
+
+    free(pkt.data);
+    dt_unlock(&vp.mutex);
     return 0;
 }
 
-static int video_encoder_release(JNIEnv *env, jobject thiz) {
-    LOGI("Video Encoder Init");
+extern "C" void Java_com_dttv_dtlive_CameraActivity_native_1video_1release(JNIEnv *env, jobject thiz) {
+    codec_destroy_codec(vp.video_codec);
+    return;
+}
+
+extern "C" jint JNIEXPORT JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
+    JNIEnv* jni;
+    if (jvm->GetEnv(reinterpret_cast<void**>(&jni), JNI_VERSION_1_6) != JNI_OK)
+        return -1;
+    return JNI_VERSION_1_6;
+}
+
+extern "C" jint JNIEXPORT JNICALL JNI_OnUnLoad(JavaVM *jvm, void *reserved) {
     return 0;
-}
-
-
-#define NELEM(x) ((int)(sizeof(x) / sizeof((x)[0])))
-static const char *const kClassName = "com/dttv/dtlive/CameraActivity";
-
-static JNINativeMethod g_Methods[] = {
-    {"native_video_init",  "(II)I",   (void *) video_encoder_init},
-    {"native_video_process",  "([BI)I",   (void *) video_encoder_encode},
-    {"native_video_release",  "()V",   (void *) video_encoder_release},
-};
-
-static int register_natives(JNIEnv *env) {
-    jclass clazz;
-    clazz = env->FindClass(kClassName);
-    if (clazz == NULL) {
-        LOGI("Error:Not found java activity");
-        return JNI_FALSE;
-    }
-
-    if (env->RegisterNatives(clazz, g_Methods, NELEM(g_Methods)) < 0) {
-        LOGI("Error: Register native failed");
-        return JNI_FALSE;
-    }
-
-    return JNI_TRUE;
-}
-
-jint JNI_OnLoad(JavaVM *vm, void *reserved) {
-    JNIEnv *env = NULL;
-
-    if (vm->GetEnv((void **) &env, JNI_VERSION_1_4) != JNI_OK) {
-        LOGI("ERROR: GetEnv failed\n");
-        return JNI_FALSE;
-    }
-
-    if (register_natives(env) < 0) {
-        LOGI("ERROR: MediaPlayer native registration failed\n");
-        return JNI_FALSE;
-    }
-
-    return JNI_VERSION_1_4;
 }
