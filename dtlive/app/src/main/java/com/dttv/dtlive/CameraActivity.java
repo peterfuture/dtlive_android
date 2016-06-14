@@ -22,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class CameraActivity extends Activity {
 
@@ -36,6 +37,7 @@ public class CameraActivity extends Activity {
     Button buttonCaptureVideo;
     Button buttonCaptureLive;
     private boolean isRecording = false;
+    private boolean isLiveing = false;
 
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
@@ -44,6 +46,8 @@ public class CameraActivity extends Activity {
     private static final int CAPTURE_TYPE_VIDEO = 1;
     private static final int CAPTURE_TYPE_LIVE = 2;
     int mCurrentMode = CAPTURE_TYPE_PHOTO;
+
+    private ReentrantLock previewLock = new ReentrantLock();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,7 +101,11 @@ public class CameraActivity extends Activity {
                         }
 
                         if(mCurrentMode == CAPTURE_TYPE_LIVE) {
-                            // Fixme
+                            if (isLiveing) {
+                                stoptLive();
+                            } else {
+                                startLive();
+                            }
                         }
 
 
@@ -113,7 +121,6 @@ public class CameraActivity extends Activity {
                     public void onClick(View v) {
                         mCurrentMode = CAPTURE_TYPE_PHOTO;
                         captureTypeChange(mCurrentMode);
-                        native_video_encoder_init(1280, 720);
                     }
                 }
         );
@@ -297,6 +304,48 @@ public class CameraActivity extends Activity {
         return true;
     }
 
+    private Camera.PreviewCallback previewCb = new Camera.PreviewCallback() {
+        public void onPreviewFrame(byte[] frame, Camera c) {
+            previewLock.lock();
+            doVideoEncode(frame);
+            c.addCallbackBuffer(frame);
+            previewLock.unlock();
+        }
+    };
+
+    private void doVideoEncode(byte[] frame) {
+        int picWidth = mPreview.getCurrentSize().width;
+        int picHeight = mPreview.getCurrentSize().height;
+        int size = picWidth*picHeight + picWidth*picHeight/2;
+        native_video_process(frame, size);
+    };
+
+    // Live
+    private int startLive()
+    {
+        if(isRecording) {
+            Log.i(TAG, "Error, quit record video first");
+            return 0;
+        }
+
+        native_video_init(mPreview.getCurrentSize().width, mPreview.getCurrentSize().height);
+        mPreview.startCaptureLive(previewCb);
+        setCaptureVideoButtonText("Stop");
+        isLiveing = true;
+        return 0;
+    }
+
+    // Live
+    private int stoptLive()
+    {
+        mPreview.stopCaptureLive();
+        setCaptureVideoButtonText("Capture");
+        native_video_release();
+        isLiveing = false;
+        return 0;
+    }
+
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -320,9 +369,9 @@ public class CameraActivity extends Activity {
         }
     }
 
-    public native int native_video_encoder_init(int width, int height);
-    public native int native_video_encoder_encode(byte[] in, byte[] out, int key);
-    public native void native_video_encoder_release();
+    public native int native_video_init(int width, int height);
+    public native int native_video_process(byte[] in, int size);
+    public native void native_video_release();
 
     static {
         System.loadLibrary("dtlive_jni");

@@ -1,6 +1,8 @@
 package com.dttv.dtlive;
 
 import android.content.Context;
+import android.graphics.ImageFormat;
+import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -20,7 +22,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private List<Camera.Size> mListSupportedSizes;
     Camera.Size mCurrentSize;
     private List<int[]> mListSupportedFps;
-    int mCurrentFrameRate;
+    private int mCurrentFrameRate;
+    private int mCameraBufferNumber = 4;
 
     public CameraPreview(Context context, Camera camera) {
         super(context);
@@ -104,6 +107,36 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             Log.d(TAG, "Error starting camera preview: " + e.getMessage());
         }
 
+    }
+
+    public int startCaptureLive(Camera.PreviewCallback cb)
+    {
+        // setup camera
+        Camera.Parameters p = mCamera.getParameters();
+        p.setPreviewSize(mCurrentSize.width, mCurrentSize.height);
+        p.setPreviewFormat(ImageFormat.NV21);
+        mCamera.setParameters(p);
+
+        PixelFormat pixelFormat = new PixelFormat();
+        PixelFormat.getPixelFormatInfo(ImageFormat.NV21, pixelFormat);
+        int bufSize = mCurrentSize.width * mCurrentSize.height * pixelFormat.bitsPerPixel / 8;
+        byte[] buffer = null;
+
+        int bufNumber = 25;
+
+        for(int i = 0; i < mCameraBufferNumber; i++) {
+            buffer = new byte[ bufSize ];
+            mCamera.addCallbackBuffer(buffer);
+        }
+        mCamera.setPreviewCallbackWithBuffer(cb);
+
+        return 0;
+    }
+
+    public int stopCaptureLive()
+    {
+        mCamera.setPreviewCallbackWithBuffer(null);
+        return 0;
     }
 
 }
