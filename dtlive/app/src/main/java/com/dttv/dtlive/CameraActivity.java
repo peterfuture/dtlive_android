@@ -10,6 +10,7 @@ import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -19,9 +20,18 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
+import java.util.BitSet;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
+
+import org.java_websocket.WebSocket;
+import org.java_websocket.handshake.ClientHandshake;
+import org.java_websocket.server.WebSocketServer;
 
 public class CameraActivity extends Activity {
 
@@ -38,6 +48,8 @@ public class CameraActivity extends Activity {
     private boolean isRecording = false;
     private boolean isLiveing = false;
 
+    private int mMaxEncodeFrameSize = 1920 * 1080 * 2;
+
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
 
@@ -47,6 +59,22 @@ public class CameraActivity extends Activity {
     int mCurrentMode = CAPTURE_TYPE_PHOTO;
 
     private ReentrantLock previewLock = new ReentrantLock();
+
+    private int STREAMING_MODE_RTMP_BIT = 0;
+    private int STREAMING_MODE_WEBSOCKET_BIT = 1;
+    private BitSet mStreamMode = new BitSet();
+
+    private ReentrantLock mStreamingLock = new ReentrantLock();
+    private StreamingServer streamingServer = null;
+    private int mWebSocketPort = 9000;
+    Handler streamingHandler;
+    private final int mStreamingInterval = 100;
+    private List<byte[]> mListVideoFrames;
+    byte[] mEncodedVideoFrame = new byte[mMaxEncodeFrameSize];
+
+    private String mRTMPServerIP = "192.168.1.1";
+    private int mRTMPServerPort = 1935; // red5 port
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +87,9 @@ public class CameraActivity extends Activity {
         mPreview = new CameraPreview(this, mCamera);
         FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
         preview.addView(mPreview);
+
+        mStreamMode.set(STREAMING_MODE_RTMP_BIT, false);
+        mStreamMode.set(STREAMING_MODE_WEBSOCKET_BIT, false);
 
         // Add a listener to the Capture button
         captureButton = (Button) findViewById(R.id.button_capture);
@@ -148,6 +179,13 @@ public class CameraActivity extends Activity {
 
 
         captureTypeChange(mCurrentMode);
+        streamingHandler = new Handler();
+        streamingHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                doStreaming();
+            }
+        }, mStreamingInterval);
     }
 
     private void captureTypeChange(int type)
@@ -316,7 +354,30 @@ public class CameraActivity extends Activity {
         int picWidth = mPreview.getCurrentSize().width;
         int picHeight = mPreview.getCurrentSize().height;
         int size = picWidth*picHeight + picWidth*picHeight/2;
-        native_video_process(frame, size);
+        int framesize = native_video_process(frame, mEncodedVideoFrame, size);
+        if(framesize <= 0)
+            return;
+
+        byte[] videoHeader = new byte[8];
+        int millis = (int)(System.currentTimeMillis() % 65535);
+        videoHeader[0] = (byte)0x19;
+        videoHeader[1] = (byte)0x79;
+        // timestamp
+        videoHeader[2] = (byte)(millis & 0xFF);
+        videoHeader[3] = (byte)((millis>>8) & 0xFF);
+        // length
+        videoHeader[4] = (byte)(framesize & 0xFF);
+        videoHeader[5] = (byte)((framesize>>8) & 0xFF);
+        videoHeader[6] = (byte)((framesize>>16) & 0xFF);
+        videoHeader[7] = (byte)((framesize>>24) & 0xFF);
+
+        mStreamingLock.lock();
+        if(mListVideoFrames.size() < 10) {
+            mListVideoFrames.add(new byte[framesize+8]);
+            System.arraycopy(videoHeader, 0, mListVideoFrames.get(mListVideoFrames.size()), 0, 8);
+            System.arraycopy(mEncodedVideoFrame, 0, mListVideoFrames.get(mListVideoFrames.size()), 8, framesize);
+        }
+        mStreamingLock.unlock();
     };
 
     // Live
@@ -328,6 +389,7 @@ public class CameraActivity extends Activity {
         }
 
         native_video_init(mPreview.getCurrentSize().width, mPreview.getCurrentSize().height);
+        native_stream_init(mRTMPServerIP, mRTMPServerPort);
         mPreview.startCaptureLive(previewCb);
         setCaptureVideoButtonText("Stop");
         isLiveing = true;
@@ -340,6 +402,7 @@ public class CameraActivity extends Activity {
         mPreview.stopCaptureLive();
         setCaptureVideoButtonText("Capture");
         native_video_release();
+        native_stream_release();
         isLiveing = false;
         return 0;
     }
@@ -368,9 +431,117 @@ public class CameraActivity extends Activity {
         }
     }
 
+    private void doStreaming () {
+        synchronized(CameraActivity.this) {
+
+            if(isLiveing) {
+
+                mStreamingLock.lock();
+
+                // websocket streaming
+                if (mStreamMode.get(STREAMING_MODE_WEBSOCKET_BIT) == true) {
+                    if (mListVideoFrames.size() > 0) {
+                        streamingServer.sendMedia(mListVideoFrames.get(0), mListVideoFrames.get(0).length);
+                    }
+                }
+
+                // rtmp streaming
+                if(mStreamMode.get(STREAMING_MODE_RTMP_BIT) == true) {
+                    if (mListVideoFrames.size() > 0) {
+                        native_stream_send(mListVideoFrames.get(0), mListVideoFrames.get(0).length);
+                    }
+                }
+                if (mListVideoFrames.size() > 0) {
+                    streamingServer.sendMedia(mListVideoFrames.get(0), mListVideoFrames.get(0).length);
+                    mListVideoFrames.remove(0);
+                }
+
+                mStreamingLock.unlock();
+            }
+        }
+
+        streamingHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                doStreaming();
+            }
+        }, mStreamingInterval);
+
+    }
+
+    private class StreamingServer extends WebSocketServer {
+        private WebSocket mediaSocket = null;
+        public boolean inStreaming = false;
+        ByteBuffer buf = ByteBuffer.allocate(mMaxEncodeFrameSize);
+
+        public StreamingServer( int port) throws UnknownHostException {
+            super( new InetSocketAddress( port ) );
+        }
+
+        public boolean sendMedia(byte[] data, int length) {
+            boolean ret = false;
+
+            if ( inStreaming == true) {
+                buf.clear();
+                buf.put(data, 0, length);
+                buf.flip();
+            }
+
+            if ( inStreaming == true) {
+                mediaSocket.send( buf );
+                ret = true;
+            }
+
+            return ret;
+        }
+
+        @Override
+        public void onOpen( WebSocket conn, ClientHandshake handshake ) {
+            if ( inStreaming == true) {
+                conn.close();
+            } else {
+                mediaSocket = conn;
+                inStreaming = true;
+            }
+        }
+
+        @Override
+        public void onClose( WebSocket conn, int code, String reason, boolean remote ) {
+            if ( conn == mediaSocket) {
+                inStreaming = false;
+                mediaSocket = null;
+            }
+        }
+
+        @Override
+        public void onError( WebSocket conn, Exception ex ) {
+            if ( conn == mediaSocket) {
+                inStreaming = false;
+                mediaSocket = null;
+            }
+        }
+
+        @Override
+        public void onMessage( WebSocket conn, ByteBuffer blob ) {
+
+        }
+
+        @Override
+        public void onMessage( WebSocket conn, String message ) {
+
+        }
+
+    }
+
+
     public native int native_video_init(int width, int height);
-    public native int native_video_process(byte[] in, int size);
-    public native void native_video_release();
+    public native int native_video_process(byte[] in, byte[] out, int size);
+    public native int native_video_release();
+
+    private native int native_stream_init(String ip, int port);
+    public native int native_stream_send(byte[] data, int size);
+    public native int native_stream_release();
+
 
     static {
         System.loadLibrary("dtlive_jni");
