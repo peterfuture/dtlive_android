@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">dtlive</string>
+
+    <!-- camera activity -->
+    <string name="action_favorite">favorite</string>
+    <string name="action_settings">setting</string>
 </resources>

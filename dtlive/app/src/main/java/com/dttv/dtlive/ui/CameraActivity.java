@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
@@ -11,13 +12,16 @@ import android.net.Uri;
 import android.os.Environment;
 import android.os.Bundle;
 import android.os.Handler;
+
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 
 import com.dttv.dtlive.R;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -35,7 +39,7 @@ import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
-public class CameraActivity extends Activity {
+public class CameraActivity extends AppCompatActivity {
 
     static final String TAG = "CAMERA-ACTIVITY";
 
@@ -82,16 +86,6 @@ public class CameraActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
-
-        // Create an instance of Camera
-        mCamera = getCameraInstance();
-        // Create our Preview view and set it as the content of our activity.
-        mPreview = new CameraPreview(this, mCamera);
-        FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
-        preview.addView(mPreview);
-
-        mStreamMode.set(STREAMING_MODE_RTMP_BIT, false);
-        mStreamMode.set(STREAMING_MODE_WEBSOCKET_BIT, false);
 
         // Add a listener to the Capture button
         captureButton = (Button) findViewById(R.id.button_capture);
@@ -179,7 +173,6 @@ public class CameraActivity extends Activity {
                 }
         );
 
-
         captureTypeChange(mCurrentMode);
         streamingHandler = new Handler();
         streamingHandler.postDelayed(new Runnable() {
@@ -188,6 +181,17 @@ public class CameraActivity extends Activity {
                 doStreaming();
             }
         }, mStreamingInterval);
+
+
+        // Create an instance of Camera
+        mCamera = getCameraInstance();
+        // Create our Preview view and set it as the content of our activity.
+        mPreview = new CameraPreview(this, mCamera);
+        FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
+        preview.addView(mPreview);
+
+        mStreamMode.set(STREAMING_MODE_RTMP_BIT, false);
+        mStreamMode.set(STREAMING_MODE_WEBSOCKET_BIT, false);
     }
 
     private void captureTypeChange(int type)
