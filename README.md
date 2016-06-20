@@ -6,19 +6,15 @@ This program is free software: you can redistribute it and/or modify it under th
 
 ## Build
 
-* todo
+android studio
+
+## Thanks
+* [BottomBar](https://github.com/roughike/BottomBar)
+* [Android UI素材库](https://github.com/google/material-design-icons/)
 
 ## Deps
 
 * [dtcodec](https://github.com/peterfuture/dtcodec)
-
-## Protocal
-<table>
-<tbody>
-<tr><td><em>type</em></td><td><em>rtmp</em></td><td><em>hls</em></td></tr>
-<tr><td>live</td><td>Todo</td><td>Todo</td></tr>
-</tbody>
-</table>
 
 ## Author
 
