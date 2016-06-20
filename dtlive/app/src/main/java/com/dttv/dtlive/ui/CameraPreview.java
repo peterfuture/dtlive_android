@@ -1,4 +1,4 @@
-package com.dttv.dtlive;
+package com.dttv.dtlive.ui;
 
 import android.content.Context;
 import android.graphics.ImageFormat;

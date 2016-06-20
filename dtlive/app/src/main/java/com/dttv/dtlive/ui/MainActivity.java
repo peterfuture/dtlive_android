@@ -1,7 +1,9 @@
-package com.dttv.dtlive;
+package com.dttv.dtlive.ui;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.dttv.dtlive.R;
 
 public class MainActivity extends AppCompatActivity {
 

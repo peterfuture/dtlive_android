@@ -1,4 +1,4 @@
-package com.dttv.dtlive;
+package com.dttv.dtlive.ui;
 
 import android.app.Activity;
 import android.content.Context;
@@ -15,6 +15,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+
+import com.dttv.dtlive.R;
 
 import java.io.File;
 import java.io.FileNotFoundException;
