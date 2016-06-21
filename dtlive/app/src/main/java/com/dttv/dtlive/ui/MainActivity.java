@@ -1,6 +1,8 @@
 package com.dttv.dtlive.ui;
 
+import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.IdRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -13,7 +15,9 @@ import com.dttv.dtlive.R;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+        implements LiveBrowserFragment.OnLiveBrowserListFragmentInteractionListener,
+        LivePlayFragment.OnLivePlayFragmentInteractionListener {
 
     // UI
     private BottomBar mBottomBar;
@@ -65,6 +69,12 @@ public class MainActivity extends AppCompatActivity {
         //mBottomBar.mapColorForTab(3, "#FF5252");
         //mBottomBar.mapColorForTab(4, "#FF9800");
         mBottomBar.noTopOffset();
+
+        // fragment setup
+        LiveBrowserFragment fragment = new LiveBrowserFragment();
+        fragment.setArguments(getIntent().getExtras());
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.id_main_fragment, fragment).commit();
     }
 
     @Override
@@ -91,6 +101,17 @@ public class MainActivity extends AppCompatActivity {
                 // Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void onLiveBrowserListFragmentInteraction(Uri uri) {
+        // The user selected the headline of an article from the HeadlinesFragment
+        // Do something here to display that article
+    }
+
+    public void onLivePlayFragmentInteraction(Uri uri)
+    {
+        // The user selected the headline of an article from the HeadlinesFragment
+        // Do something here to display that article
     }
 
     @Override
