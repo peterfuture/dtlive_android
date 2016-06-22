@@ -19,16 +19,15 @@
             android:layout_height="@dimen/player_height"
             android:layout_alignParentTop="true" >
 
-            <ImageView
-                android:id="@+id/id_details_pic"
+            <android.widget.VideoView
+                android:id="@+id/id_videoview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
                 android:adjustViewBounds="false"
                 android:contentDescription="@null"
-                android:scaleType="fitXY"
-                android:src="@drawable/play_bg" />
+                android:scaleType="fitXY" />
 
             <ImageButton
                 android:id="@+id/pre_play_button"
@@ -38,7 +37,7 @@
                 android:background="#00000000"
                 android:contentDescription="@null"
                 android:src="@drawable/play_btn_style"
-                android:visibility="invisible" />
+                android:visibility="visible" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -81,13 +80,5 @@
                 android:textColor="@color/textColor"
                 android:textSize="@dimen/play_content_size" />
         </RelativeLayout>
-        <ImageButton
-            android:id="@+id/back_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:background="#00000000"
-            android:contentDescription="@null"
-            android:src="@drawable/play_btn_style" />
     </LinearLayout>
 </RelativeLayout>

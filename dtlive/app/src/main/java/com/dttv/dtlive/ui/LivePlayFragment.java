@@ -4,13 +4,19 @@ import android.app.Fragment;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import com.dttv.dtlive.R;
 import com.dttv.dtlive.model.LiveChannelModel;
+
+import java.io.IOException;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,6 +27,8 @@ import com.dttv.dtlive.model.LiveChannelModel;
  * create an instance of this fragment.
  */
 public class LivePlayFragment extends Fragment {
+
+    static final String TAG = "PLAY-FRAGMENT";
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -30,9 +38,11 @@ public class LivePlayFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private VideoView mVideoView;
     private LiveChannelModel.LiveChannelItem mItem;
 
     private OnLivePlayFragmentInteractionListener mListener;
+
 
     public LivePlayFragment() {
         // Required empty public constructor
@@ -86,6 +96,27 @@ public class LivePlayFragment extends Fragment {
 
         TextView content = (TextView) view.findViewById(R.id.content);
         content.setText(mItem.details);
+
+        mVideoView = (VideoView) view.findViewById(R.id.id_videoview);
+        final ImageButton mWatchButton = (ImageButton) view.findViewById(R.id.pre_play_button);
+        mWatchButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                try {
+                    Log.i(TAG, "Start playing:" + mItem.uri);
+                    Uri uri=Uri.parse(mItem.uri);
+                    mVideoView.setVideoURI(uri);
+                    mVideoView.start();
+                    mVideoView.requestFocus();
+                    mWatchButton.setVisibility(View.INVISIBLE);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
         return view;
     }
 
@@ -109,6 +140,7 @@ public class LivePlayFragment extends Fragment {
 
     @Override
     public void onDetach() {
+        mVideoView.stopPlayback();
         super.onDetach();
         mListener = null;
     }
