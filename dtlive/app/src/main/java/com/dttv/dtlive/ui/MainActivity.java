@@ -12,6 +12,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.dttv.dtlive.R;
+import com.dttv.dtlive.model.LiveChannelModel;
+import com.dttv.dtlive.ui.dummy.DummyContent;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
 
@@ -103,7 +105,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void onLiveBrowserListFragmentInteraction(Uri uri) {
+    public void onLiveBrowserListFragmentInteraction(LiveChannelModel.LiveChannelItem item) {
         // The user selected the headline of an article from the HeadlinesFragment
         // Do something here to display that article
     }

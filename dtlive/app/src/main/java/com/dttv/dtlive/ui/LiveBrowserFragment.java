@@ -11,10 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.dttv.dtlive.R;
+import com.dttv.dtlive.adapters.LiveBrowserAdapter;
+import com.dttv.dtlive.model.LiveChannelModel;
 import com.dttv.dtlive.ui.dummy.DummyContent;
 import com.dttv.dtlive.ui.dummy.DummyContent.DummyItem;
-
-import java.util.List;
 
 /**
  * A fragment representing a list of Items.
@@ -70,7 +70,7 @@ public class LiveBrowserFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new LiveBrowserAdapter(DummyContent.ITEMS, mListener));
+            recyclerView.setAdapter(new LiveBrowserAdapter(LiveChannelModel.ITEMS, mListener));
         }
         return view;
     }
@@ -105,6 +105,6 @@ public class LiveBrowserFragment extends Fragment {
      */
     public interface OnLiveBrowserListFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onLiveBrowserListFragmentInteraction(DummyItem item);
+        void onLiveBrowserListFragmentInteraction(LiveChannelModel.LiveChannelItem item);
     }
 }

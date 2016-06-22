@@ -1,27 +1,30 @@
-package com.dttv.dtlive.ui;
+package com.dttv.dtlive.adapters;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.dttv.dtlive.ui.ItemFragment.OnListFragmentInteractionListener;
-import com.dttv.dtlive.ui.dummy.DummyContent.DummyItem;
+import com.dttv.dtlive.R;
+import com.dttv.dtlive.ui.LiveBrowserFragment.OnLiveBrowserListFragmentInteractionListener;
+import com.dttv.dtlive.model.LiveChannelModel;
+import com.dttv.dtlive.model.LiveChannelModel.LiveChannelItem;
 
 import java.util.List;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
+ * {@link RecyclerView.Adapter} that can display a {@link LiveChannelItem} and makes a call to the
+ * specified {@link OnLiveBrowserListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
 public class LiveBrowserAdapter extends RecyclerView.Adapter<LiveBrowserAdapter.ViewHolder> {
 
-    private final List<DummyItem> mValues;
-    private final OnListFragmentInteractionListener mListener;
+    private final List<LiveChannelModel.LiveChannelItem> mValues;
+    private final OnLiveBrowserListFragmentInteractionListener mListener;
 
-    public LiveBrowserAdapter(List<DummyItem> items, OnListFragmentInteractionListener listener) {
+    public LiveBrowserAdapter(List<LiveChannelModel.LiveChannelItem> items, OnLiveBrowserListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -29,7 +32,7 @@ public class LiveBrowserAdapter extends RecyclerView.Adapter<LiveBrowserAdapter.
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_item, parent, false);
+                .inflate(R.layout.fragment_live_browser_item, parent, false);
         return new ViewHolder(view);
     }
 
@@ -37,6 +40,7 @@ public class LiveBrowserAdapter extends RecyclerView.Adapter<LiveBrowserAdapter.
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
         holder.mIdView.setText(mValues.get(position).id);
+        holder.mTitleView.setText(mValues.get(position).title);
         holder.mContentView.setText(mValues.get(position).content);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
@@ -45,7 +49,7 @@ public class LiveBrowserAdapter extends RecyclerView.Adapter<LiveBrowserAdapter.
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mItem);
+                    mListener.onLiveBrowserListFragmentInteraction(holder.mItem);
                 }
             }
         });
@@ -59,14 +63,19 @@ public class LiveBrowserAdapter extends RecyclerView.Adapter<LiveBrowserAdapter.
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
         public final TextView mIdView;
+        public TextView mTitleView;
         public final TextView mContentView;
-        public DummyItem mItem;
+        public ImageView mThumbImageView;
+        public LiveChannelItem mItem;
+
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
             mIdView = (TextView) view.findViewById(R.id.id);
+            mTitleView = (TextView) view.findViewById(R.id.title);
             mContentView = (TextView) view.findViewById(R.id.content);
+            mThumbImageView = (ImageView) view.findViewById(R.id.thumb);
         }
 
         @Override

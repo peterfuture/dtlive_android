@@ -10,6 +10,12 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.dttv.dtlive.ui.MainActivity">
 
+    <FrameLayout
+        android:id="@+id/id_main_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+    
     <android.support.v7.widget.Toolbar
         android:id="@+id/id_camera_activity_toolbar"
         android:layout_width="match_parent"
@@ -19,10 +25,6 @@
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
-    <FrameLayout
-        android:id="@+id/id_main_fragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
 
 </RelativeLayout>
