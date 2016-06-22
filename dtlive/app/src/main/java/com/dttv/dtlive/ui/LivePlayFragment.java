@@ -1,14 +1,16 @@
 package com.dttv.dtlive.ui;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.dttv.dtlive.R;
+import com.dttv.dtlive.model.LiveChannelModel;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -28,6 +30,8 @@ public class LivePlayFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private LiveChannelModel.LiveChannelItem mItem;
+
     private OnLivePlayFragmentInteractionListener mListener;
 
     public LivePlayFragment() {
@@ -43,14 +47,23 @@ public class LivePlayFragment extends Fragment {
      * @return A new instance of fragment LivePlayFragment.
      */
     // TODO: Rename and change types and number of parameters
+    /*
     public static LivePlayFragment newInstance(String param1, String param2) {
         LivePlayFragment fragment = new LivePlayFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
+
+        return fragment;
+    }*/
+
+    public static LivePlayFragment newInstance(LiveChannelModel.LiveChannelItem item) {
+        LivePlayFragment fragment = new LivePlayFragment();
+        fragment.mItem = item;
         return fragment;
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -65,7 +78,15 @@ public class LivePlayFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_live_play, container, false);
+        //return inflater.inflate(R.layout.fragment_live_play, container, false);
+
+        View view = inflater.inflate(R.layout.fragment_live_play, container, false);
+        TextView title = (TextView) view.findViewById(R.id.title);
+        title.setText(mItem.title);
+
+        TextView content = (TextView) view.findViewById(R.id.content);
+        content.setText(mItem.details);
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event

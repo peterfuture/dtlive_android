@@ -8,4 +8,12 @@
     <dimen name="placehold_thumb_height">36dp</dimen>
     <dimen name="video_list_title">17sp</dimen>
     <dimen name="video_list_content">13sp</dimen>
+
+    <dimen name="player_height">225dp</dimen>
+    <dimen name="play_inner_content_padding">15dp</dimen>
+    <dimen name="play_title_size">26sp</dimen>
+    <dimen name="play_content_part_margin">16dp</dimen>
+    <dimen name="play_author_size">20sp</dimen>
+    <dimen name="seprate_line">1px</dimen>
+    <dimen name="play_content_size">15sp</dimen>
 </resources>

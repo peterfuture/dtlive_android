@@ -1,5 +1,6 @@
 package com.dttv.dtlive.ui;
 
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.IdRes;
@@ -19,8 +20,13 @@ public class MainActivity extends AppCompatActivity
         implements LiveBrowserFragment.OnLiveBrowserListFragmentInteractionListener,
         LivePlayFragment.OnLivePlayFragmentInteractionListener {
 
+    static final String TAG = "MAIN-ACTIVITY";
+
     // UI
     private BottomBar mBottomBar;
+
+    // control
+    private int mHome;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +76,7 @@ public class MainActivity extends AppCompatActivity
         //mBottomBar.mapColorForTab(4, "#FF9800");
         mBottomBar.noTopOffset();
 
-        // fragment setup
+        // live browser fragment setup
         LiveBrowserFragment fragment = new LiveBrowserFragment();
         fragment.setArguments(getIntent().getExtras());
         getSupportFragmentManager().beginTransaction()
@@ -104,14 +110,30 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void onLiveBrowserListFragmentInteraction(LiveChannelModel.LiveChannelItem item) {
-        // The user selected the headline of an article from the HeadlinesFragment
-        // Do something here to display that article
+        // start play activity fragment
+/*
+        LivePlayFragment fragment = new LivePlayFragment(item);
+        fragment.setArguments(getIntent().getExtras());
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.id_main_fragment, fragment).commit();*/
+
+        LivePlayFragment fragment = LivePlayFragment.newInstance(item);
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        // Replace whatever is in the fragment_container view with this fragment,
+        // and add the transaction to the back stack
+        transaction.replace(R.id.id_main_fragment, fragment);
+        transaction.addToBackStack(null);
+        // Commit the transaction
+        transaction.commit();
     }
 
     public void onLivePlayFragmentInteraction(Uri uri)
     {
-        // The user selected the headline of an article from the HeadlinesFragment
-        // Do something here to display that article
+        // back to live browser activity fragment
+        LiveBrowserFragment fragment = new LiveBrowserFragment();
+        fragment.setArguments(getIntent().getExtras());
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.id_main_fragment, fragment).commit();
     }
 
     @Override
