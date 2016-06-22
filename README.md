@@ -11,6 +11,7 @@ android studio
 ## Thanks
 * [BottomBar](https://github.com/roughike/BottomBar)
 * [Android UI素材库](https://github.com/google/material-design-icons/)
+* [AnimeTaste](https://github.com/daimajia/AnimeTaste)
 
 ## Deps
 
