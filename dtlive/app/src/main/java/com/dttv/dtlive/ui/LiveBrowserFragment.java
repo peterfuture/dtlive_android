@@ -13,8 +13,6 @@ import android.view.ViewGroup;
 import com.dttv.dtlive.R;
 import com.dttv.dtlive.adapters.LiveBrowserAdapter;
 import com.dttv.dtlive.model.LiveChannelModel;
-import com.dttv.dtlive.ui.dummy.DummyContent;
-import com.dttv.dtlive.ui.dummy.DummyContent.DummyItem;
 
 /**
  * A fragment representing a list of Items.

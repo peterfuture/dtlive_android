@@ -1,6 +1,5 @@
 package com.dttv.dtlive.ui;
 
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.IdRes;
@@ -13,7 +12,6 @@ import android.view.MenuItem;
 
 import com.dttv.dtlive.R;
 import com.dttv.dtlive.model.LiveChannelModel;
-import com.dttv.dtlive.ui.dummy.DummyContent;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
 
