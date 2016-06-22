@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="@drawable/list_item"
     android:paddingBottom="10dp"
     android:paddingLeft="15dp"
@@ -15,7 +15,7 @@
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:scaleType="fitXY"
-        android:src="@mipmap/ic_videocam_white_48dp" />
+        android:src="@mipmap/ic_slow_motion_video_black_36dp" />
 
     <TextView
         android:id="@+id/id"
@@ -33,7 +33,6 @@
         android:layout_marginLeft="12dp"
         android:layout_toRightOf="@+id/thumb"
         android:textSize="@dimen/video_list_title"
-        android:layout_margin="@dimen/text_margin"
         android:textAppearance="?attr/textAppearanceListItem"
         android:textStyle="bold"/>
 
