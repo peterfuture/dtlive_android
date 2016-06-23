@@ -16,4 +16,11 @@
     <dimen name="play_author_size">20sp</dimen>
     <dimen name="seprate_line">1px</dimen>
     <dimen name="play_content_size">15sp</dimen>
+    <!--Setting-->
+    <dimen name="photo_height">225dp</dimen>
+    <dimen name="setting_item_height">55dp</dimen>
+    <dimen name="setting_padding">15dp</dimen>
+    <dimen name="setting_arrow">20dp</dimen>
+    <dimen name="setting_text_padding_left">8dp</dimen>
+    <dimen name="setting_item_padding">8dp</dimen>
 </resources>

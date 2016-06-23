@@ -9,4 +9,6 @@
     <color name="backgroundColorPress">#DBDBD3</color>
     <!--LivePlay Adapter-->
     <color name="textColor">#909090</color>
+    <!--Setting-->
+    <color name="setting_item_line">#9FA19F</color>
 </resources>

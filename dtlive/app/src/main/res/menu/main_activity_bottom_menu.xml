@@ -3,15 +3,15 @@
     <item
         android:id="@+id/id_watch_live"
         android:icon="@mipmap/ic_movie_white_24dp"
-        android:title="watch" />
+        android:title="看直播" />
     <item
         android:id="@+id/id_do_live"
         android:icon="@mipmap/ic_videocam_white_24dp"
-        android:title="live" />
+        android:title="直播" />
     <item
         android:id="@+id/id_acount"
         android:icon="@mipmap/ic_account_circle_white_24dp"
-        android:title="account" />
+        android:title="账户" />
 
 </menu>
 

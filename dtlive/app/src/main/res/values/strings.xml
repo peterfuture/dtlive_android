@@ -4,7 +4,11 @@
     <!-- camera activity -->
     <string name="action_favorite">favorite</string>
     <string name="action_settings">setting</string>
+    <!--setting-->
+    <string name="suggestion">意见反馈</string>
+    <string name="recommend_to_friend">推荐给小伙伴</string>
+    <string name="clear_cache">清空缓存</string>
+    <string name="use_hd">高清视频</string>
+    <string name="only_for_wifi">仅限Wifi</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

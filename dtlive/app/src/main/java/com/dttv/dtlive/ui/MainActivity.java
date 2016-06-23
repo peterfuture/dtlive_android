@@ -18,7 +18,9 @@ import com.roughike.bottombar.OnMenuTabClickListener;
 
 public class MainActivity extends AppCompatActivity
         implements LiveBrowserFragment.OnLiveBrowserListFragmentInteractionListener,
-        LivePlayFragment.OnLivePlayFragmentInteractionListener {
+        LivePlayFragment.OnLivePlayFragmentInteractionListener,
+        SettingFragment.OnSettingFragmentInteractionListener
+{
 
     static final String TAG = "MAIN-ACTIVITY";
 
@@ -47,10 +49,18 @@ public class MainActivity extends AppCompatActivity
 
                 if (menuItemId == R.id.id_watch_live) {
                     // The user selected item number one.
+                    LiveBrowserFragment fragment = new LiveBrowserFragment();
+                    FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                    transaction.replace(R.id.id_main_fragment, fragment);
+                    transaction.commit();
                 }
 
                 if (menuItemId == R.id.id_acount) {
                     // The user selected item number one.
+                    SettingFragment fragment = new SettingFragment();
+                    FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                    transaction.replace(R.id.id_main_fragment, fragment);
+                    transaction.commit();
                 }
             }
 
@@ -75,9 +85,9 @@ public class MainActivity extends AppCompatActivity
 
         // live browser fragment setup
         LiveBrowserFragment fragment = new LiveBrowserFragment();
-        fragment.setArguments(getIntent().getExtras());
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.id_main_fragment, fragment).commit();
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(R.id.id_main_fragment, fragment);
+        transaction.commit();
     }
 
     @Override
@@ -108,12 +118,6 @@ public class MainActivity extends AppCompatActivity
 
     public void onLiveBrowserListFragmentInteraction(LiveChannelModel.LiveChannelItem item) {
         // start play activity fragment
-/*
-        LivePlayFragment fragment = new LivePlayFragment(item);
-        fragment.setArguments(getIntent().getExtras());
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.id_main_fragment, fragment).commit();*/
-
         LivePlayFragment fragment = LivePlayFragment.newInstance(item);
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         // Replace whatever is in the fragment_container view with this fragment,
@@ -126,11 +130,12 @@ public class MainActivity extends AppCompatActivity
 
     public void onLivePlayFragmentInteraction(Uri uri)
     {
-        // back to live browser activity fragment
-        LiveBrowserFragment fragment = new LiveBrowserFragment();
-        fragment.setArguments(getIntent().getExtras());
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.id_main_fragment, fragment).commit();
+        // do nothing
+    }
+
+    public void onSettingFragmentInteraction(Uri uri)
+    {
+        // do nothing
     }
 
     @Override
