@@ -25,9 +25,6 @@ public class MainActivity extends AppCompatActivity
     // UI
     private BottomBar mBottomBar;
 
-    // control
-    private int mHome;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -4,47 +4,63 @@
     android:layout_height="wrap_content"
     android:background="@drawable/list_item"
     android:paddingBottom="10dp"
-    android:paddingLeft="15dp"
-    android:paddingRight="15dp"
+    android:paddingLeft="0dp"
+    android:paddingRight="0dp"
     android:paddingTop="10dp" >
 
-    <ImageView
-        android:id="@+id/thumb"
-        android:layout_width="@dimen/placehold_thumb_width"
-        android:layout_height="@dimen/placehold_thumb_height"
-        android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true"
-        android:scaleType="fitXY"
-        android:src="@mipmap/ic_slow_motion_video_black_36dp" />
-
-    <TextView
-        android:id="@+id/id"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:id="@+id/item"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
-        android:textAppearance="?attr/textAppearanceListItem"
-        android:visibility="gone"/>
+        android:background="@drawable/list_item"
+        android:paddingBottom="10dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp">
+        <ImageView
+            android:id="@+id/thumb"
+            android:layout_width="@dimen/placehold_thumb_width"
+            android:layout_height="@dimen/placehold_thumb_height"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:scaleType="fitXY"
+            android:src="@mipmap/ic_slow_motion_video_black_36dp" />
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/thumb"
-        android:layout_marginLeft="12dp"
-        android:layout_toRightOf="@+id/thumb"
-        android:textSize="@dimen/video_list_title"
-        android:textAppearance="?attr/textAppearanceListItem"
-        android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/text_margin"
+            android:textAppearance="?attr/textAppearanceListItem"
+            android:visibility="gone"/>
 
-    <TextView
-        android:id="@+id/content"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/title"
-        android:layout_below="@+id/title"
-        android:layout_marginTop="4dp"
-        android:maxLines="2"
-        android:layout_margin="@dimen/text_margin"
-        android:textAppearance="?attr/textAppearanceListItem"
-        android:textSize="@dimen/video_list_content"/>
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/thumb"
+            android:layout_marginLeft="12dp"
+            android:layout_toRightOf="@+id/thumb"
+            android:textSize="@dimen/video_list_title"
+            android:textAppearance="?attr/textAppearanceListItem"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/title"
+            android:layout_below="@+id/title"
+            android:layout_marginTop="4dp"
+            android:maxLines="2"
+            android:layout_margin="@dimen/text_margin"
+            android:textAppearance="?attr/textAppearanceListItem"
+            android:textSize="@dimen/video_list_content"/>
+    </RelativeLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/seprate_line"
+        android:paddingLeft="0dp"
+        android:paddingRight="0dp"
+        android:layout_below="@+id/item"
+        android:background="@android:color/darker_gray" />
 </RelativeLayout>

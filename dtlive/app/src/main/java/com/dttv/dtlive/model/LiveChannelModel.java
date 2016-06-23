@@ -39,6 +39,12 @@ public class LiveChannelModel {
         addItem(item2);
         LiveChannelItem item3 = new LiveChannelItem("3", uri, title, content, details);
         addItem(item3);
+        LiveChannelItem item4 = new LiveChannelItem("4", uri, title, content, details);
+        addItem(item4);
+        LiveChannelItem item5 = new LiveChannelItem("5", uri, title, content, details);
+        addItem(item5);
+        LiveChannelItem item6 = new LiveChannelItem("6", uri, title, content, details);
+        addItem(item6);
     }
 
     private static void addItem(LiveChannelItem item) {
