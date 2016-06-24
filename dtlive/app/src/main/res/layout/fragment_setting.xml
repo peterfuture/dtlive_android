@@ -102,6 +102,36 @@
             </RelativeLayout>
 
             <RelativeLayout
+                android:id="@+id/server_addr"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/setting_item_height">
+
+                <TextView
+                    android:id="@+id/server_addr_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:paddingLeft="@dimen/setting_text_padding_left"
+                    android:text="@string/live_addr"/>
+
+                <android.support.design.widget.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autoText="false"
+                    android:layout_toRightOf="@+id/server_addr_text"
+                    android:text="rtmp:192.168.1.100/live/test"
+                    />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/seprate_line"
+                    android:layout_alignParentBottom="true"
+                    android:background="@color/setting_item_line"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
                 android:id="@+id/recommend"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/setting_item_height"

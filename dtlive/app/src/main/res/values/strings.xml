@@ -8,7 +8,8 @@
     <string name="suggestion">意见反馈</string>
     <string name="recommend_to_friend">推荐给小伙伴</string>
     <string name="clear_cache">清空缓存</string>
-    <string name="use_hd">高清视频</string>
+    <string name="live_addr">直播地址:</string>
+    <string name="use_hd">高清直播</string>
     <string name="only_for_wifi">仅限Wifi</string>
 
 </resources>
