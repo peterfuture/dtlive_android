@@ -193,6 +193,7 @@ public class LivePublishFragment extends Fragment {
         LiveJniLib.native_stream_init(mRTMPServerIP, mRTMPServerPort);
         mPreview.startCaptureLive(previewCb);
         isLiveing = true;
+        captureButton.setImageResource(R.mipmap.ic_adjust_white_48dp);
         return 0;
     }
 
@@ -203,6 +204,7 @@ public class LivePublishFragment extends Fragment {
         LiveJniLib.native_video_release();
         LiveJniLib.native_stream_release();
         isLiveing = false;
+        captureButton.setImageResource(R.mipmap.ic_brightness_1_white_48dp);
         return 0;
     }
 

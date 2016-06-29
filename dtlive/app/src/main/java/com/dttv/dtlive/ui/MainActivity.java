@@ -69,11 +69,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onMenuTabReSelected(@IdRes int menuItemId) {
-                if (menuItemId == R.id.id_do_live) {
-                    // The user reselected item number one, scroll your content to top.
-                    Intent intent = new Intent(MainActivity.this, CameraActivity.class);
-                    startActivity(intent);
-                }
+                return;
             }
         });
 
