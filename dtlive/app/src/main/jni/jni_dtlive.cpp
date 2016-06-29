@@ -34,7 +34,7 @@ struct video_processor
 
 static struct video_processor vp;
 
-extern "C" int Java_com_dttv_dtlive_CameraActivity_native_1video_1init (JNIEnv *env, jobject thiz, jint width, jint height) {
+extern "C" int Java_com_dttv_dtlive_utils_LiveJniLib_native_1video_1init (JNIEnv *env, jobject thiz, jint width, jint height) {
     codec_register_all();
     memset(&vp, 0, sizeof(struct video_processor));
     dt_lock_init(&vp.mutex, NULL);
@@ -59,7 +59,7 @@ unsigned char* as_unsigned_char_array(JNIEnv *env, jbyteArray array) {
     return buf;
 }
 
-extern "C"  int Java_com_dttv_dtlive_CameraActivity_native_1video_1process(JNIEnv *env, jobject thiz, jbyteArray in, jbyteArray out, jint size) {
+extern "C"  int Java_com_dttv_dtlive_utils_LiveJniLib_native_1video_1process(JNIEnv *env, jobject thiz, jbyteArray in, jbyteArray out, jint size) {
     dt_lock(&vp.mutex);
 
     struct codec_packet pkt;
@@ -81,20 +81,20 @@ extern "C"  int Java_com_dttv_dtlive_CameraActivity_native_1video_1process(JNIEn
     return 0;
 }
 
-extern "C" int Java_com_dttv_dtlive_CameraActivity_native_1video_1release(JNIEnv *env, jobject thiz) {
+extern "C" int Java_com_dttv_dtlive_utils_LiveJniLib_native_1video_1release(JNIEnv *env, jobject thiz) {
     codec_destroy_codec(vp.video_codec);
     return 0;
 }
 
-extern "C" int Java_com_dttv_dtlive_CameraActivity_native_1stream_1init(JNIEnv *env, jobject thiz, jstring ip, int port) {
+extern "C" int Java_com_dttv_dtlive_utils_LiveJniLib_native_1stream_1init(JNIEnv *env, jobject thiz, jstring ip, int port) {
     return 0;
 }
 
-extern "C" int Java_com_dttv_dtlive_CameraActivity_native_1stream_1send(JNIEnv *env, jobject thiz, jbyteArray data, jint length) {
+extern "C" int Java_com_dttv_dtlive_utils_LiveJniLib_native_1stream_1send(JNIEnv *env, jobject thiz, jbyteArray data, jint length) {
     return 0;
 }
 
-extern "C" int Java_com_dttv_dtlive_CameraActivity_native_1stream_1release(JNIEnv *env, jobject thiz) {
+extern "C" int Java_com_dttv_dtlive_utils_LiveJniLib_native_1stream_1release(JNIEnv *env, jobject thiz) {
     return 0;
 }
 

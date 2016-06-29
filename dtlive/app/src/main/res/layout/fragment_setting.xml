@@ -120,7 +120,7 @@
                     android:layout_height="wrap_content"
                     android:autoText="false"
                     android:layout_toRightOf="@+id/server_addr_text"
-                    android:text="rtmp:192.168.1.100/live/test"
+                    android:text="rtmp:192.168.1.101/live/test"
                     />
 
                 <View

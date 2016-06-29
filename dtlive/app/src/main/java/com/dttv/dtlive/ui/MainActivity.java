@@ -19,6 +19,7 @@ import com.roughike.bottombar.OnMenuTabClickListener;
 public class MainActivity extends AppCompatActivity
         implements LiveBrowserFragment.OnLiveBrowserListFragmentInteractionListener,
         LivePlayFragment.OnLivePlayFragmentInteractionListener,
+        LivePublishFragment.OnLivePublishFragmentInteractionListener,
         SettingFragment.OnSettingFragmentInteractionListener
 {
 
@@ -43,8 +44,10 @@ public class MainActivity extends AppCompatActivity
             public void onMenuTabSelected(@IdRes int menuItemId) {
                 if (menuItemId == R.id.id_do_live) {
                     // The user selected item number one.
-                    Intent intent = new Intent(MainActivity.this, CameraActivity.class);
-                    startActivity(intent);
+                    LivePublishFragment fragment = new LivePublishFragment();
+                    FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                    transaction.replace(R.id.id_main_fragment, fragment);
+                    transaction.commit();
                 }
 
                 if (menuItemId == R.id.id_watch_live) {
@@ -126,6 +129,11 @@ public class MainActivity extends AppCompatActivity
         transaction.addToBackStack(null);
         // Commit the transaction
         transaction.commit();
+    }
+
+    public void onLivePublishFragmentInteraction(Uri uri)
+    {
+        // do nothing
     }
 
     public void onLivePlayFragmentInteraction(Uri uri)
