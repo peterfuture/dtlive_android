@@ -21,6 +21,7 @@
 #define dt_unlock(x)      pthread_mutex_unlock(x)
 
 #include "codec_api.h"
+#include "rtmp_api.h"
 
 struct video_processor
 {
@@ -33,6 +34,7 @@ struct video_processor
 };
 
 static struct video_processor vp;
+static struct rtmp_context *rtmp_handle;
 
 extern "C" int Java_com_dttv_dtlive_utils_LiveJniLib_native_1video_1init (JNIEnv *env, jobject thiz, jint width, jint height) {
     codec_register_all();
@@ -78,7 +80,7 @@ extern "C"  int Java_com_dttv_dtlive_utils_LiveJniLib_native_1video_1process(JNI
     free(pkt.data);
     free(buf);
     dt_unlock(&vp.mutex);
-    return 0;
+    return ret;
 }
 
 extern "C" int Java_com_dttv_dtlive_utils_LiveJniLib_native_1video_1release(JNIEnv *env, jobject thiz) {
@@ -86,15 +88,33 @@ extern "C" int Java_com_dttv_dtlive_utils_LiveJniLib_native_1video_1release(JNIE
     return 0;
 }
 
-extern "C" int Java_com_dttv_dtlive_utils_LiveJniLib_native_1stream_1init(JNIEnv *env, jobject thiz, jstring ip, int port) {
+extern "C" int Java_com_dttv_dtlive_utils_LiveJniLib_native_1stream_1init(JNIEnv *env, jobject thiz, jstring uri) {
+    struct rtmp_para para;
+    memset(&para, 0, sizeof(struct rtmp_para));
+    para.write_enable = 1;
+
+    jboolean isCopy;
+    const char *server_addr = env->GetStringUTFChars(uri, &isCopy);
+    strcpy(para.uri, server_addr);
+    rtmp_handle = rtmp_open(&para);
     return 0;
 }
 
 extern "C" int Java_com_dttv_dtlive_utils_LiveJniLib_native_1stream_1send(JNIEnv *env, jobject thiz, jbyteArray data, jint length) {
+
+    unsigned char *buf = as_unsigned_char_array(env, data);
+    int size = 0;
+    if(rtmp_handle) {
+        size = rtmp_write(rtmp_handle, buf, length);
+        LOGI("rtmp send:%d", size);
+    }
     return 0;
 }
 
 extern "C" int Java_com_dttv_dtlive_utils_LiveJniLib_native_1stream_1release(JNIEnv *env, jobject thiz) {
+    if(rtmp_handle)
+        rtmp_close(rtmp_handle);
+    rtmp_handle = NULL;
     return 0;
 }
 

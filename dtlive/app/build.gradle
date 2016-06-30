@@ -12,6 +12,12 @@ model {
                     sharedLibraryFile = file("${lib_distribution_root}/dtcodec/${targetPlatform.getName()}/libdtcodec.so")
                 }
             }
+            dtrtmp {
+                headers.srcDir "${lib_distribution_root}/dtrtmp/include"
+                binaries.withType(SharedLibraryBinary) {
+                    sharedLibraryFile = file("${lib_distribution_root}/dtrtmp/${targetPlatform.getName()}/libdtrtmp.so")
+                }
+            }
         }
     }
     android {
@@ -41,11 +47,13 @@ model {
                 jni {
                     dependencies {
                         library 'dtcodec' linkage 'shared'
+                        library 'dtrtmp' linkage 'shared'
                     }
                 }
                 jniLibs {
                     source {
                         srcDir "${lib_distribution_root}/dtcodec/"
+                        srcDir "${lib_distribution_root}/dtrtmp/"
                     }
                 }
             }

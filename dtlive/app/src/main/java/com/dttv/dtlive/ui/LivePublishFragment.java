@@ -17,6 +17,7 @@ import android.widget.ImageButton;
 import com.dttv.dtlive.R;
 import com.dttv.dtlive.utils.LiveJniLib;
 
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Iterator;
@@ -62,6 +63,7 @@ public class LivePublishFragment extends Fragment {
 
     private String mRTMPServerIP = "192.168.1.101";
     private int mRTMPServerPort = 1935; // red5 port
+    private String mLivePublishUri = "rtmp://192.168.1.101:1935/live/test";
 
 
     public LivePublishFragment() {
@@ -131,6 +133,7 @@ public class LivePublishFragment extends Fragment {
         FrameLayout preview = (FrameLayout) view.findViewById(R.id.camera_preview);
         preview.addView(mPreview);
 
+        mListVideoFrames = new ArrayList<byte[]>();
         return view;
     }
 
@@ -180,8 +183,8 @@ public class LivePublishFragment extends Fragment {
         mStreamingLock.lock();
         if(mListVideoFrames.size() < 10) {
             mListVideoFrames.add(new byte[framesize+8]);
-            System.arraycopy(videoHeader, 0, mListVideoFrames.get(mListVideoFrames.size()), 0, 8);
-            System.arraycopy(mEncodedVideoFrame, 0, mListVideoFrames.get(mListVideoFrames.size()), 8, framesize);
+            System.arraycopy(videoHeader, 0, mListVideoFrames.get(mListVideoFrames.size() - 1), 0, 8);
+            System.arraycopy(mEncodedVideoFrame, 0, mListVideoFrames.get(mListVideoFrames.size() - 1), 8, framesize);
         }
         mStreamingLock.unlock();
     };
@@ -190,7 +193,7 @@ public class LivePublishFragment extends Fragment {
     private int startLive()
     {
         LiveJniLib.native_video_init(mPreview.getCurrentSize().width, mPreview.getCurrentSize().height);
-        LiveJniLib.native_stream_init(mRTMPServerIP, mRTMPServerPort);
+        LiveJniLib.native_stream_init(mLivePublishUri);
         mPreview.startCaptureLive(previewCb);
         isLiveing = true;
         captureButton.setImageResource(R.mipmap.ic_adjust_white_48dp);

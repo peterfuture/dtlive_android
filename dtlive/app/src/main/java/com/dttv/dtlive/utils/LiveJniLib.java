@@ -12,7 +12,7 @@ public class LiveJniLib {
     public static native int native_video_process(byte[] in, byte[] out, int size);
     public static native int native_video_release();
 
-    public static native int native_stream_init(String ip, int port);
+    public static native int native_stream_init(String uri);
     public static native int native_stream_send(byte[] data, int size);
     public static native int native_stream_release();
 
