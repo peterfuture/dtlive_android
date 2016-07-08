@@ -2,9 +2,10 @@
 
 完全开源可用的直播app demo. [English.](https://github.com/peterfuture/dtlive_android/blob/master/README_EN.md)
 
-## 功能介
+## 功能介绍
 * 直播功能: H264+AAC编码通过rtmp协议推送
-* 点播功能: 一个简单的使用videoview实现的demo
+* 观看直播: 一个简单的使用videoview实现的demo
+* 弹幕功能: 正在开发中...
 * 设置: 设置直播服务器地址等
  
 ## 测试方法
