@@ -7,7 +7,7 @@ android:paddingBottom="@dimen/activity_vertical_margin"
 android:paddingLeft="@dimen/activity_horizontal_margin"
 android:paddingRight="@dimen/activity_horizontal_margin"
 android:paddingTop="@dimen/activity_vertical_margin"
-tools:context="com.dttv.dtlive.ui.CameraActivity">
+tools:context="com.dttv.dtlive.ui.MainActivity">
 
 <FrameLayout
     android:id="@+id/camera_preview"
@@ -17,19 +17,56 @@ tools:context="com.dttv.dtlive.ui.CameraActivity">
     android:visibility="visible"
     />
 
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:layout_alignParentBottom="true">
-    <ImageButton
-        android:id="@+id/id_button_capture"
-        android:text="Capture"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:src="@mipmap/ic_brightness_1_white_48dp"
-        />
-</LinearLayout>
+        android:orientation="vertical"
+        android:layout_alignParentTop="true">
+        <TextView
+            android:id="@+id/id_publish_server"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:paddingLeft="@dimen/setting_text_padding_left"
+            android:textColor="@android:color/holo_red_dark"
+            android:text="@string/publish_server"/>
+
+        <TextView
+            android:id="@+id/id_network_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:paddingLeft="@dimen/setting_text_padding_left"
+            android:textColor="@android:color/holo_red_dark"
+            android:text="@string/publish_network_status"/>
+
+        <TextView
+            android:id="@+id/id_live_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:paddingLeft="@dimen/setting_text_padding_left"
+            android:textColor="@android:color/holo_red_dark"
+            android:text="@string/publish_live_status"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true">
+        <ImageButton
+            android:id="@+id/id_button_capture"
+            android:text="Capture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@mipmap/ic_brightness_1_white_48dp"
+            />
+    </LinearLayout>
 
 </RelativeLayout>

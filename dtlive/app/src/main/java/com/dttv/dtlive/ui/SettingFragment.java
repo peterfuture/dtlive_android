@@ -2,11 +2,18 @@ package com.dttv.dtlive.ui;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.design.widget.TextInputEditText;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ToggleButton;
 
 import com.dttv.dtlive.R;
 
@@ -28,7 +35,14 @@ public class SettingFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    static final String TAG = "PLAY-FRAGMENT";
+
     private OnSettingFragmentInteractionListener mListener;
+
+    private SharedPreferences mSharedPreferences;
+    private ToggleButton mSwitchOnlyWifi;
+    private ToggleButton mSwitchUseHD;
+    private TextInputEditText mPublishServer;
 
     public SettingFragment() {
         // Required empty public constructor
@@ -65,8 +79,37 @@ public class SettingFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_setting, container, false);
+        View view = inflater.inflate(R.layout.fragment_setting, container, false);
+
+        mSwitchOnlyWifi = (ToggleButton) view.findViewById(R.id.switch_wifi);
+        mSwitchUseHD = (ToggleButton) view.findViewById(R.id.switch_hd);
+        mPublishServer = (TextInputEditText) view.findViewById(R.id.id_publish_server);
+
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.getActivity());
+        mSwitchOnlyWifi.setChecked(mSharedPreferences.getBoolean("only_wifi",true));
+        mSwitchUseHD.setChecked(mSharedPreferences.getBoolean("use_hd", true));
+        mPublishServer.setText(mSharedPreferences.getString("publish_server", "rtmp://192.168.1.101:1935/live/test"));
+
+        mPublishServer.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                mSharedPreferences.edit().putString("publish_server", s.toString()).apply();
+                Log.i(TAG, "Publish server changed to: " + s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        return view;
     }
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {

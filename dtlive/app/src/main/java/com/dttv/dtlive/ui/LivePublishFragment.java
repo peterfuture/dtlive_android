@@ -2,17 +2,20 @@ package com.dttv.dtlive.ui;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.hardware.Camera;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.dttv.dtlive.R;
 import com.dttv.dtlive.utils.LiveJniLib;
@@ -51,6 +54,9 @@ public class LivePublishFragment extends Fragment {
     private CameraPreview mPreview;
 
     ImageButton captureButton;
+    TextView tv_PublishServer;
+    TextView tv_NetworkStatus;
+    TextView tv_LiveStatus;
 
     private boolean isLiveing = false;
     private int mMaxEncodeFrameSize = 1920 * 1080 * 2;
@@ -61,9 +67,10 @@ public class LivePublishFragment extends Fragment {
     private List<byte[]> mListVideoFrames;
     byte[] mEncodedVideoFrame = new byte[mMaxEncodeFrameSize];
 
+    private SharedPreferences mSharedPreferences;
     private String mRTMPServerIP = "192.168.1.101";
     private int mRTMPServerPort = 1935; // red5 port
-    private String mLivePublishUri = "rtmp://192.168.1.101:1935/live/test";
+    private String mLivePublishUri;
 
 
     public LivePublishFragment() {
@@ -103,6 +110,10 @@ public class LivePublishFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_live_publish, container, false);
 
+        // publish server
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.getActivity());
+        mLivePublishUri = mSharedPreferences.getString("publish_server", "rtmp://192.168.1.101:1935/live/test");
+
         // Add a listener to the Capture button
         captureButton = (ImageButton) view.findViewById(R.id.id_button_capture);
         captureButton.setOnClickListener(
@@ -117,6 +128,14 @@ public class LivePublishFragment extends Fragment {
                 }
             }
         );
+
+        tv_PublishServer = (TextView) view.findViewById(R.id.id_publish_server);
+        tv_NetworkStatus = (TextView) view.findViewById(R.id.id_network_status);
+        tv_LiveStatus = (TextView) view.findViewById(R.id.id_live_status);
+
+        tv_PublishServer.setText(getText(R.string.publish_server).toString() + mLivePublishUri);
+        tv_NetworkStatus.setText(getText(R.string.publish_network_status).toString() + getText(R.string.publish_network_status_wifi).toString());
+        tv_LiveStatus.setText(getText(R.string.publish_live_status).toString() + getText(R.string.publish_live_status_no).toString());
 
         streamingHandler = new Handler();
         streamingHandler.postDelayed(new Runnable() {
@@ -166,28 +185,6 @@ public class LivePublishFragment extends Fragment {
         int framesize = LiveJniLib.native_video_process(frame, mEncodedVideoFrame, size);
         if(framesize <= 0)
             return;
-/*
-        byte[] videoHeader = new byte[8];
-        int millis = (int)(System.currentTimeMillis() % 65535);
-        videoHeader[0] = (byte)0x19;
-        videoHeader[1] = (byte)0x79;
-        // timestamp
-        videoHeader[2] = (byte)(millis & 0xFF);
-        videoHeader[3] = (byte)((millis>>8) & 0xFF);
-        // length
-        videoHeader[4] = (byte)(framesize & 0xFF);
-        videoHeader[5] = (byte)((framesize>>8) & 0xFF);
-        videoHeader[6] = (byte)((framesize>>16) & 0xFF);
-        videoHeader[7] = (byte)((framesize>>24) & 0xFF);
-
-        mStreamingLock.lock();
-        if(mListVideoFrames.size() < 10) {
-            mListVideoFrames.add(new byte[framesize+8]);
-            System.arraycopy(videoHeader, 0, mListVideoFrames.get(mListVideoFrames.size() - 1), 0, 8);
-            System.arraycopy(mEncodedVideoFrame, 0, mListVideoFrames.get(mListVideoFrames.size() - 1), 8, framesize);
-        }
-        mStreamingLock.unlock();
-*/
         mStreamingLock.lock();
         if(mListVideoFrames.size() < 10) {
             mListVideoFrames.add(new byte[framesize]);
@@ -205,6 +202,7 @@ public class LivePublishFragment extends Fragment {
         mPreview.startCaptureLive(previewCb);
         isLiveing = true;
         captureButton.setImageResource(R.mipmap.ic_adjust_white_48dp);
+        tv_LiveStatus.setText(getText(R.string.publish_live_status).toString() + getText(R.string.publish_live_status_yes).toString());
         return 0;
     }
 
@@ -216,6 +214,7 @@ public class LivePublishFragment extends Fragment {
         LiveJniLib.native_stream_release();
         isLiveing = false;
         captureButton.setImageResource(R.mipmap.ic_brightness_1_white_48dp);
+        tv_LiveStatus.setText(getText(R.string.publish_live_status).toString() + getText(R.string.publish_live_status_no).toString());
         return 0;
     }
 
