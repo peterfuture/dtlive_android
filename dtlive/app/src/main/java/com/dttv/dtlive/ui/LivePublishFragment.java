@@ -166,7 +166,7 @@ public class LivePublishFragment extends Fragment {
         int framesize = LiveJniLib.native_video_process(frame, mEncodedVideoFrame, size);
         if(framesize <= 0)
             return;
-
+/*
         byte[] videoHeader = new byte[8];
         int millis = (int)(System.currentTimeMillis() % 65535);
         videoHeader[0] = (byte)0x19;
@@ -187,6 +187,14 @@ public class LivePublishFragment extends Fragment {
             System.arraycopy(mEncodedVideoFrame, 0, mListVideoFrames.get(mListVideoFrames.size() - 1), 8, framesize);
         }
         mStreamingLock.unlock();
+*/
+        mStreamingLock.lock();
+        if(mListVideoFrames.size() < 10) {
+            mListVideoFrames.add(new byte[framesize]);
+            System.arraycopy(mEncodedVideoFrame, 0, mListVideoFrames.get(mListVideoFrames.size() - 1), 0, framesize);
+        }
+        mStreamingLock.unlock();
+
     };
 
     // Live

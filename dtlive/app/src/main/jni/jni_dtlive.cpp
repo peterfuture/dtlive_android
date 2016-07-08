@@ -22,6 +22,7 @@
 
 #include "codec_api.h"
 #include "rtmp_api.h"
+#include "flvmux_api.h"
 
 struct video_processor
 {
@@ -34,7 +35,8 @@ struct video_processor
 };
 
 static struct video_processor vp;
-static struct rtmp_context *rtmp_handle;
+static struct rtmp_context *rtmp_handle = NULL;
+static struct flvmux_context *flvmux_handle = NULL;
 
 extern "C" int Java_com_dttv_dtlive_utils_LiveJniLib_native_1video_1init (JNIEnv *env, jobject thiz, jint width, jint height) {
     codec_register_all();
@@ -64,22 +66,33 @@ unsigned char* as_unsigned_char_array(JNIEnv *env, jbyteArray array) {
 extern "C"  int Java_com_dttv_dtlive_utils_LiveJniLib_native_1video_1process(JNIEnv *env, jobject thiz, jbyteArray in, jbyteArray out, jint size) {
     dt_lock(&vp.mutex);
 
+
+    jboolean isCopy = JNI_TRUE;
+    jbyte* inbuf = env->GetByteArrayElements(in, NULL);
+    jbyte* outbuf = env->GetByteArrayElements(out, &isCopy);
+
     struct codec_packet pkt;
-    pkt.data = (uint8_t *)malloc(1920*1080*4);
-    unsigned char *buf = as_unsigned_char_array(env, in);
+    pkt.data = (uint8_t *)outbuf;
     struct codec_frame frame;
-    frame.data = (uint8_t *)buf;
+    frame.data = (uint8_t *)inbuf;
     frame.size = size;
     frame.key = 1;
 
     int ret = codec_encode_frame(vp.video_codec, &pkt, &frame);
-    if(ret > 0) {
+    if(ret < 0) {
         LOGI("Encode one frame ok");
+#if 0
+        for(int i = 0; i < 100; i += 5) {
+            LOGI("%02x %02x %02x %02x %02x \n", frame.data[i], frame.data[i+1], frame.data[i+2], frame.data[i+3], frame.data[i+4]);
+        }
+        LOGI("AFTER PROCESS");
+#endif
     }
 
-    free(pkt.data);
-    free(buf);
     dt_unlock(&vp.mutex);
+
+    env->ReleaseByteArrayElements(out, outbuf, 0);
+    env->ReleaseByteArrayElements(in, inbuf, JNI_ABORT);
     return ret;
 }
 
@@ -89,24 +102,58 @@ extern "C" int Java_com_dttv_dtlive_utils_LiveJniLib_native_1video_1release(JNIE
 }
 
 extern "C" int Java_com_dttv_dtlive_utils_LiveJniLib_native_1stream_1init(JNIEnv *env, jobject thiz, jstring uri) {
-    struct rtmp_para para;
-    memset(&para, 0, sizeof(struct rtmp_para));
-    para.write_enable = 1;
+    struct rtmp_para rtmp_para;
+    memset(&rtmp_para, 0, sizeof(struct rtmp_para));
+    rtmp_para.write_enable = 1;
 
     jboolean isCopy;
     const char *server_addr = env->GetStringUTFChars(uri, &isCopy);
-    strcpy(para.uri, server_addr);
-    rtmp_handle = rtmp_open(&para);
+    strcpy(rtmp_para.uri, server_addr);
+    LOGI("publish url:%s\n", server_addr);
+    rtmp_handle = rtmp_open(&rtmp_para);
+    if(!rtmp_handle) {
+        LOGI("RTMP Open Failed \n");
+        return -1;
+    }
+
+    struct flvmux_para flv_para;
+    memset(&flv_para, 0, sizeof(struct flvmux_para));
+    flv_para.has_video = 1;
+    flvmux_handle = flvmux_open(&flv_para);
+    rtmp_write(rtmp_handle, (uint8_t *)flvmux_handle->header, (int)flvmux_handle->header_size);
+    LOGI("RTMP Open ok and send header size:%d \n", (int)flvmux_handle->header_size);
     return 0;
 }
 
 extern "C" int Java_com_dttv_dtlive_utils_LiveJniLib_native_1stream_1send(JNIEnv *env, jobject thiz, jbyteArray data, jint length) {
 
     unsigned char *buf = as_unsigned_char_array(env, data);
+    LOGI("BEFORE SEND");
+    for(int i = 0; i < 100; i += 5) {
+        LOGI("%02x %02x %02x %02x %02x \n", buf[i], buf[i+1], buf[i+2], buf[i+3], buf[i+4]);
+    }
+    LOGI("AFTER SEND");
     int size = 0;
-    if(rtmp_handle) {
-        size = rtmp_write(rtmp_handle, buf, length);
-        LOGI("rtmp send:%d", size);
+    if(rtmp_handle && flvmux_handle) {
+
+        struct flvmux_packet in, out;
+        memset(&in, 0, sizeof(struct flvmux_packet));
+        memset(&out, 0, sizeof(struct flvmux_packet));
+        in.data = buf;
+        in.size = length;
+
+        size = flvmux_setup_video_frame(flvmux_handle, &in, &out);
+        if(size < 0) {
+            LOGI("flv setup video frame failed \n");
+            return 0;
+        }
+        size = rtmp_write(rtmp_handle, out.data, size);
+        if(size < 0) {
+            LOGI("rtmp send frame failed:%d", size);
+        }
+        free(out.data);
+
+        LOGI("rtmp send frame ok:%d", size);
     }
     return 0;
 }
@@ -114,6 +161,8 @@ extern "C" int Java_com_dttv_dtlive_utils_LiveJniLib_native_1stream_1send(JNIEnv
 extern "C" int Java_com_dttv_dtlive_utils_LiveJniLib_native_1stream_1release(JNIEnv *env, jobject thiz) {
     if(rtmp_handle)
         rtmp_close(rtmp_handle);
+    if(flvmux_handle)
+        flvmux_close(flvmux_handle);
     rtmp_handle = NULL;
     return 0;
 }
