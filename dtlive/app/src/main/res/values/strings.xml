@@ -16,7 +16,9 @@
     <string name="publish_server">直播地址:</string>
     <string name="publish_network_status">网络连接:</string>
     <string name="publish_network_status_wifi">wifi</string>
+    <string name="publish_network_status_mobile">mobile</string>
     <string name="publish_network_status_ethernet">ethernet</string>
+    <string name="publish_network_status_off">off</string>
     <string name="publish_live_status">直播状态:</string>
     <string name="publish_live_status_yes">直播中</string>
     <string name="publish_live_status_no">未直播</string>

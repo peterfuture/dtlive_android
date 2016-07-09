@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.dttv.dtlive.R;
 import com.dttv.dtlive.utils.LiveJniLib;
+import com.dttv.dtlive.utils.NetworkUtils;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -134,7 +135,16 @@ public class LivePublishFragment extends Fragment {
         tv_LiveStatus = (TextView) view.findViewById(R.id.id_live_status);
 
         tv_PublishServer.setText(getText(R.string.publish_server).toString() + mLivePublishUri);
-        tv_NetworkStatus.setText(getText(R.string.publish_network_status).toString() + getText(R.string.publish_network_status_wifi).toString());
+
+        if (NetworkUtils.isNetworkAvailable(this.getActivity())) {
+            if (NetworkUtils.isWifiConnected(this.getActivity()))
+                tv_NetworkStatus.setText(getText(R.string.publish_network_status).toString() + getText(R.string.publish_network_status_wifi).toString());
+            else
+                tv_NetworkStatus.setText(getText(R.string.publish_network_status).toString() + getText(R.string.publish_network_status_mobile).toString());
+        } else {
+            tv_NetworkStatus.setText(getText(R.string.publish_network_status).toString() + getText(R.string.publish_network_status_off).toString());
+        }
+        
         tv_LiveStatus.setText(getText(R.string.publish_live_status).toString() + getText(R.string.publish_live_status_no).toString());
 
         streamingHandler = new Handler();
