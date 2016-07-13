@@ -23,12 +23,12 @@
 [下载]()编译好的apk.
 
 ## 依赖仓库
-
 * [dtcodec](https://github.com/peterfuture/dtcodec)－音视频编码开源库
 * [dtrtmp](https://github.com/peterfuture/dtrtmp)－提供rtmp推送以及flv mux功能
 
 
 ## 参考项目
+* [android-eye](https://github.com/Teaonly/android-eye)
 * [BottomBar](https://github.com/roughike/BottomBar)
 * [Android UI素材库](https://github.com/google/material-design-icons/)
 * [AnimeTaste](https://github.com/daimajia/AnimeTaste)
