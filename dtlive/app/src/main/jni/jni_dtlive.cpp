@@ -14,58 +14,30 @@
  *   app/src/main/java/com/dttv/dtlive/CameraActivity.java
  */
 
-#include "pthread.h"
-#define dt_lock_t         pthread_mutex_t
-#define dt_lock_init(x,v) pthread_mutex_init(x,v)
-#define dt_lock(x)        pthread_mutex_lock(x)
-#define dt_unlock(x)      pthread_mutex_unlock(x)
-
 #include "codec_api.h"
 #include "rtmp_api.h"
 #include "flvmux_api.h"
 
-struct video_processor
-{
-    int width;
-    int height;
-    int count;
-
-    dt_lock_t mutex;
-    struct codec_context *video_codec;
-};
-
-static struct video_processor vp;
+struct codec_context *video_codec;
+static struct codec_context *audio_codec;
 static struct rtmp_context *rtmp_handle = NULL;
 static struct flvmux_context *flvmux_handle = NULL;
 
-extern "C" int Java_com_dttv_dtlive_utils_LiveJniLib_native_1video_1init (JNIEnv *env, jobject thiz, jint width, jint height) {
+extern "C" int Java_com_dttv_dtlive_utils_LiveJniLib_native_1audio_1init (JNIEnv *env, jobject thiz, jint samplerate, jint channels) {
     codec_register_all();
-    memset(&vp, 0, sizeof(struct video_processor));
-    dt_lock_init(&vp.mutex, NULL);
-    vp.width = width;
-    vp.height = height;
 
     struct codec_para para;
-    para.width = width;
-    para.height = height;
+    para.media_format = CODEC_MEDIA_FORMAT_AAC;
+    para.media_type = CODEC_MEDIA_TYPE_AUDIO;
+    para.samplerate = samplerate;
+    para.channels = channels;
     para.is_encoder = 1;
-    para.media_format = CODEC_MEDIA_FORMAT_H264;
-    para.media_type = CODEC_MEDIA_TYPE_VIDEO;
-    vp.video_codec = codec_create_codec(&para);
-    LOGI("Video Encoder Init, [%d:%d]", width, height);
+    audio_codec = codec_create_codec(&para);
+    LOGI("Audio Encoder Init, samplerate:%d channels:%d]", samplerate, channels);
     return 0;
 }
 
-unsigned char* as_unsigned_char_array(JNIEnv *env, jbyteArray array) {
-    int len = env->GetArrayLength (array);
-    unsigned char* buf = new unsigned char[len];
-    env->GetByteArrayRegion (array, 0, len, reinterpret_cast<jbyte*>(buf));
-    return buf;
-}
-
-extern "C"  int Java_com_dttv_dtlive_utils_LiveJniLib_native_1video_1process(JNIEnv *env, jobject thiz, jbyteArray in, jbyteArray out, jint size) {
-    dt_lock(&vp.mutex);
-
+extern "C"  int Java_com_dttv_dtlive_utils_LiveJniLib_native_1audio_1process(JNIEnv *env, jobject thiz, jbyteArray in, jbyteArray out, jint size) {
 
     jboolean isCopy = JNI_TRUE;
     jbyte* inbuf = env->GetByteArrayElements(in, NULL);
@@ -78,18 +50,55 @@ extern "C"  int Java_com_dttv_dtlive_utils_LiveJniLib_native_1video_1process(JNI
     frame.size = size;
     frame.key = 1;
 
-    int ret = codec_encode_frame(vp.video_codec, &pkt, &frame);
+    int ret = codec_encode_frame(audio_codec, &pkt, &frame);
     if(ret < 0) {
-        LOGI("Encode one frame ok");
-#if 0
-        for(int i = 0; i < 100; i += 5) {
-            LOGI("%02x %02x %02x %02x %02x \n", frame.data[i], frame.data[i+1], frame.data[i+2], frame.data[i+3], frame.data[i+4]);
-        }
-        LOGI("AFTER PROCESS");
-#endif
+        LOGI("Encode audio frame ok");
     }
 
-    dt_unlock(&vp.mutex);
+    env->ReleaseByteArrayElements(out, outbuf, 0);
+    env->ReleaseByteArrayElements(in, inbuf, JNI_ABORT);
+    return ret;
+}
+
+extern "C" int Java_com_dttv_dtlive_utils_LiveJniLib_native_1audio_1release(JNIEnv *env, jobject thiz) {
+    codec_destroy_codec(audio_codec);
+    audio_codec = NULL;
+    return 0;
+}
+
+
+extern "C" int Java_com_dttv_dtlive_utils_LiveJniLib_native_1video_1init (JNIEnv *env, jobject thiz, jint width, jint height) {
+    codec_register_all();
+
+    struct codec_para para;
+    para.media_type = CODEC_MEDIA_TYPE_VIDEO;
+    para.media_format = CODEC_MEDIA_FORMAT_H264;
+    para.width = width;
+    para.height = height;
+    para.is_encoder = 1;
+
+    video_codec = codec_create_codec(&para);
+    LOGI("Video Encoder Init, [%d:%d]", width, height);
+    return 0;
+}
+
+extern "C"  int Java_com_dttv_dtlive_utils_LiveJniLib_native_1video_1process(JNIEnv *env, jobject thiz, jbyteArray in, jbyteArray out, jint size) {
+
+    jboolean isCopy = JNI_TRUE;
+    jbyte* inbuf = env->GetByteArrayElements(in, NULL);
+    jbyte* outbuf = env->GetByteArrayElements(out, &isCopy);
+
+    struct codec_packet pkt;
+    pkt.data = (uint8_t *)outbuf;
+    struct codec_frame frame;
+    frame.data = (uint8_t *)inbuf;
+    frame.size = size;
+    frame.key = 1;
+
+    int ret = codec_encode_frame(video_codec, &pkt, &frame);
+    if(ret < 0) {
+        LOGI("Encode one frame faild");
+    }
 
     env->ReleaseByteArrayElements(out, outbuf, 0);
     env->ReleaseByteArrayElements(in, inbuf, JNI_ABORT);
@@ -97,7 +106,8 @@ extern "C"  int Java_com_dttv_dtlive_utils_LiveJniLib_native_1video_1process(JNI
 }
 
 extern "C" int Java_com_dttv_dtlive_utils_LiveJniLib_native_1video_1release(JNIEnv *env, jobject thiz) {
-    codec_destroy_codec(vp.video_codec);
+    codec_destroy_codec(video_codec);
+    video_codec = NULL;
     return 0;
 }
 
@@ -127,10 +137,10 @@ extern "C" int Java_com_dttv_dtlive_utils_LiveJniLib_native_1stream_1init(JNIEnv
 
 extern "C" int Java_com_dttv_dtlive_utils_LiveJniLib_native_1stream_1send(JNIEnv *env, jobject thiz, jbyteArray data, jint length) {
 
-    unsigned char *buf = as_unsigned_char_array(env, data);
+    jbyte* inbuf = env->GetByteArrayElements(data, NULL);
     LOGI("BEFORE SEND");
     for(int i = 0; i < 100; i += 5) {
-        LOGI("%02x %02x %02x %02x %02x \n", buf[i], buf[i+1], buf[i+2], buf[i+3], buf[i+4]);
+        LOGI("%02x %02x %02x %02x %02x \n", inbuf[i], inbuf[i+1], inbuf[i+2], inbuf[i+3], inbuf[i+4]);
     }
     LOGI("AFTER SEND");
     int size = 0;
@@ -139,7 +149,7 @@ extern "C" int Java_com_dttv_dtlive_utils_LiveJniLib_native_1stream_1send(JNIEnv
         struct flvmux_packet in, out;
         memset(&in, 0, sizeof(struct flvmux_packet));
         memset(&out, 0, sizeof(struct flvmux_packet));
-        in.data = buf;
+        in.data = (uint8_t *)inbuf;
         in.size = length;
 
         size = flvmux_setup_video_frame(flvmux_handle, &in, &out);

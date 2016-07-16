@@ -8,6 +8,10 @@ public class LiveJniLib {
         System.loadLibrary("dtlive_jni");
     }
 
+    public static native int native_audio_init(int samplerate, int channel);
+    public static native int native_audio_process(byte[] in, byte[] out, int size);
+    public static native int native_audio_release();
+
     public static native int native_video_init(int width, int height);
     public static native int native_video_process(byte[] in, byte[] out, int size);
     public static native int native_video_release();

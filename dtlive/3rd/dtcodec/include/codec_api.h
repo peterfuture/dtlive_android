@@ -21,7 +21,7 @@ enum CODEC_MEDIA_FORMAT{
     CODEC_MEDIA_FORMAT_H265      = 1,
 
     //AUDIO
-    CODEC_MEDIA_FORMAT_FAAD      = 0X100
+    CODEC_MEDIA_FORMAT_AAC       = 0X100
 };
 
 #define CODEC_ENCODER 0
@@ -32,6 +32,10 @@ struct codec_para
     int media_type;
     int media_format;
     int is_encoder;
+    
+    // audio para
+    int samplerate;
+    int channels;
 
     // video para
     int width;
@@ -55,6 +59,9 @@ struct codec_frame
     int64_t pts;
     int key;
     uint8_t *data;
+
+    // number of audio samples (per channel) described by this frame
+    int nb_samples;
 };
 
 
