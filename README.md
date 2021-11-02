@@ -1,7 +1,6 @@
 # dtlive
 
-完全开源可用的直播app demo. [English.](https://github.com/peterfuture/dtlive_android/blob/master/README_EN.md)
-
+完全开源可用的直播app demo. [English.]
 ## 功能介绍
 * 直播功能: H264+AAC编码通过rtmp协议推送
 * 观看直播: 一个简单的使用videoview实现的demo
@@ -16,15 +15,15 @@
 
 
 ## 编译方法
-* git clone https://github.com/peterfuture/dtlive_android
+* git clone 
 * 安装android studio以及sdk
 * import源码并编译
 
 [下载]()编译好的apk.
 
 ## 依赖仓库
-* [dtcodec](https://github.com/peterfuture/dtcodec)－音视频编码开源库
-* [dtrtmp](https://github.com/peterfuture/dtrtmp)－提供rtmp推送以及flv mux功能
+* [dtcodec]－音视频编码开源库
+* [dtrtmp]－提供rtmp推送以及flv mux功能
 
 
 ## 参考项目
