@@ -33,9 +33,3 @@
 * [Android UI素材库](https://github.com/google/material-design-icons/)
 * [AnimeTaste](https://github.com/daimajia/AnimeTaste)
 
-
-
-## 联系作者
-
-* Email: peter_future@outlook.com
-* QQ: 2575999523
